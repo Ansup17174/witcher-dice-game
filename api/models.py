@@ -21,6 +21,8 @@ class UserProfile(Base):
     user_id = Column(ForeignKey("user.id"))
 
     matches_won = Column(Integer, default=0)
+    matches_lost = Column(Integer, default=0)
+    matches_played = Column(Integer, default=0)
 
 
 class Email(Base):

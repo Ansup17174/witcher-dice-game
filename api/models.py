@@ -1,13 +1,13 @@
 from .database import Base
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy.dialects.postgresql import UUID
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String(50), primary_key=True, default=uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True)
     username = Column(String(50), unique=True, nullable=False)
     email = relationship("Email", back_populates="user", uselist=False)
     password = Column(String(100), nullable=False)
@@ -18,7 +18,7 @@ class UserProfile(Base):
     __tablename__ = "userprofiles"
 
     user = relationship("User", back_populates="profile")
-    user_id = Column(ForeignKey("user.id"))
+    user_id = Column(ForeignKey("users.id"), primary_key=True)
 
     matches_won = Column(Integer, default=0)
     matches_lost = Column(Integer, default=0)
@@ -33,5 +33,5 @@ class Email(Base):
     is_confirmed = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="email")
-    user_id = Column(ForeignKey("user.id"))
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
 

@@ -1,12 +1,29 @@
-from pydantic import BaseModel, ValidationError, validator
+from pydantic import BaseModel, validator
+from uuid import UUID
 import re
+
+
+class Email(BaseModel):
+    address: str
+
+    class Config:
+        orm_mode = True
+
+
+class User(BaseModel):
+    id: UUID
+    username: str
+    email: Email
+
+    class Config:
+        orm_mode = True
 
 
 class UserRegister(BaseModel):
     username: str
     email: str
-    password1: str
-    password2: str
+    password: str
+    second_password: str
 
     @validator("email")
     def validate_email(cls, email):
@@ -14,9 +31,9 @@ class UserRegister(BaseModel):
             raise ValueError("Invalid email address")
         return email
 
-    @validator("password2")
-    def validate_passwords(cls, password2, values):
-        password1 = values['password1']
-        if password1 != password2:
+    @validator("second_password")
+    def validate_passwords(cls, second_password, values):
+        password = values['password']
+        if password != second_password:
             raise ValueError("Password are not same")
-        return password2
+        return second_password

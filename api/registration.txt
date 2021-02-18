@@ -1,0 +1,6 @@
+From ${site}
+
+
+Dear ${username}, you received this mail because you've registered account on ${site}
+
+To confirm account, click on the link: ${confirmation_url}

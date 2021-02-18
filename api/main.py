@@ -18,11 +18,11 @@ def get_db():
         db.close()
 
 
-@app.post("/auth/register", response_model=User)
+@app.post("/auth/register")
 async def register(data: UserRegister, db: Session = Depends(get_db)):
     try:
         registered_user = register_user(db=db, user_data=data)
-        return registered_user
+        return {"detail": "Confirmation email sent"}
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(detail=exc.orig.args[0], status_code=400)

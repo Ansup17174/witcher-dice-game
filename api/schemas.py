@@ -5,6 +5,7 @@ import re
 
 class Email(BaseModel):
     address: str
+    is_confirmed: bool
 
     class Config:
         orm_mode = True

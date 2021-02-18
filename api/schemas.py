@@ -38,3 +38,13 @@ class UserRegister(BaseModel):
         if password != second_password:
             raise ValueError("Password are not same")
         return second_password
+
+
+class ResendEmail(BaseModel):
+    email: str
+
+    @validator("email")
+    def validate_email(cls, email):
+        if not re.match(r"[a-zA-Z0-9.]+@[a-zA-Z]+\.[a-z]+", email):
+            raise ValueError("Invalid email address")
+        return email

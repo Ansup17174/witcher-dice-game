@@ -3,7 +3,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from string import Template
 from .models import User
+from .database import SessionLocal
 from . import config
+from contextlib import contextmanager
 import os
 
 base_dir = os.path.join(os.getcwd(), 'api')
@@ -17,7 +19,7 @@ def get_template(filename: str):
 
 def send_confirmation_mail(user: User):
     site = "dicegame.net"
-    confirmation_url = f"http://localhost:8000/{user.email.activation_token}"
+    confirmation_url = f"http://localhost:8000/auth/confirm-email/{user.id}/{user.email.activation_token}"
     smtp = smtplib.SMTP(host=config.EMAIL_HOST, port=config.EMAIL_PORT)
     smtp.starttls()
     smtp.login(config.EMAIL_ADDRESS, config.EMAIL_PASSWORD)
@@ -34,3 +36,14 @@ def send_confirmation_mail(user: User):
     mail['Subject'] = "Dice game confirmation"
     mail.attach(MIMEText(message, "plain"))
     smtp.send_message(mail)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()

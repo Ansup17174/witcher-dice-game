@@ -20,9 +20,9 @@ class UserProfile(Base):
     user = relationship("User", back_populates="profile")
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
 
-    matches_won = Column(Integer, default=0)
-    matches_lost = Column(Integer, default=0)
-    matches_played = Column(Integer, default=0)
+    matches_won = Column(Integer, server_default="0", nullable=False)
+    matches_lost = Column(Integer, server_default="0", nullable=False)
+    matches_played = Column(Integer, server_default="0", nullable=False)
 
 
 class Email(Base):

@@ -1,4 +1,5 @@
 from pydantic import BaseModel, validator
+from typing import Optional
 from uuid import UUID
 import re
 
@@ -11,10 +12,20 @@ class Email(BaseModel):
         orm_mode = True
 
 
+class UserProfile(BaseModel):
+    matches_won: int
+    matches_lost: int
+    matches_played: int
+
+    class Config:
+        orm_mode = True
+
+
 class User(BaseModel):
     id: UUID
     username: str
     email: Email
+    profile: UserProfile
 
     class Config:
         orm_mode = True
@@ -48,3 +59,13 @@ class ResendEmail(BaseModel):
         if not re.match(r"[a-zA-Z0-9.]+@[a-zA-Z]+\.[a-z]+", email):
             raise ValueError("Invalid email address")
         return email
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

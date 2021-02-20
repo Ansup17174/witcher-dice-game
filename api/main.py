@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
-from .schemas import UserRegister, User, ResendEmail
+from . import models
+from .schemas import UserRegister, User, ResendEmail, UserLogin, Token
 from .database import Base, engine, SessionLocal
 from .utils import get_db
 from sqlalchemy.orm import Session
@@ -11,14 +12,6 @@ app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
 services.expired_emails_cleanup(SessionLocal())
-
-
-@app.get("/auth/users/{user_id}", response_model=User)
-def get_user(user_id: UUID, db: Session = Depends(get_db)):
-    user = services.get_user_by_id(db=db, user_id=user_id)
-    if user is None:
-        raise HTTPException(detail="User not found", status_code=404)
-    return user
 
 
 @app.post("/auth/register")
@@ -44,3 +37,20 @@ def resend(email_data: ResendEmail, db: Session = Depends(get_db)):
 def confirm_email(user_id: UUID, token: str, db: Session = Depends(get_db)):
     services.confirm_email(db=db, user_id=user_id, token=token)
     return {"detail": "Email confirmed successfully"}
+
+
+@app.post("/auth/login")
+def login(data: UserLogin, db: Session = Depends(get_db)):
+    user = services.login_user(**data.dict(), db=db)
+    if not user:
+        raise HTTPException(detail="Unable to login with given credentials", status_code=400)
+    data = {"sub": user.username}
+    token = services.generate_access_token(data=data)
+    token_model = Token(access_token=token, token_type="Bearer")
+    user_response = User.from_orm(user)
+    return {**user_response.dict(), **token_model.dict()}
+
+
+@app.get("/auth/user/", response_model=User)
+def get_user(user: models.User = Depends(services.authenticate_user)):
+    return user

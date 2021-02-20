@@ -12,7 +12,6 @@ const App = () => {
 		username: "",
 		password: ""
 	});
-	const [onlineUsers, setOnlineUsers] = useState([]);
 
 	const login = async e => {
 		e.preventDefault();

@@ -1,4 +1,4 @@
-from fastapi.websockets import WebSocket
+from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi import HTTPException
 from . import services
 from .database import SessionLocal
@@ -15,6 +15,7 @@ class ConnectionManager:
                 self.connection_list.append((websocket, user.username))
         except HTTPException:
             print("Unauthorized")
+            raise WebSocketDisconnect
 
     async def disconnect(self, websocket: WebSocket):
         print("Disconnected")

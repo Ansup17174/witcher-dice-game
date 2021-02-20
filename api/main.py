@@ -81,4 +81,5 @@ async def online_users(ws: WebSocket):
             await connection_manager.send_users_list()
     except WebSocketDisconnect:
         await connection_manager.disconnect(ws)
+        await connection_manager.send_users_list()
 

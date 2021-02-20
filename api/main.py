@@ -74,11 +74,12 @@ def get_user(user: models.User = Depends(services.authenticate_user)):
 @app.websocket("/ws/online")
 async def online_users(ws: WebSocket):
     await ws.accept()
+    connection_manager.connection_list.append([ws, ""])
     try:
         while True:
+            await connection_manager.send_users_list()
             access_token = await ws.receive_text()
             await connection_manager.authorize(ws, access_token=access_token)
-            await connection_manager.send_users_list()
     except WebSocketDisconnect:
         await connection_manager.disconnect(ws)
         await connection_manager.send_users_list()

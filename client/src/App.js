@@ -5,8 +5,8 @@ onlineUsersWs.onmessage = e => {
 	console.log(JSON.parse(e.data));
 };
 
-const App = () => {
 
+const App = () => {
 	const [onlineUsers, setOnlineUsers] = useState([]);
 	const [chatLines, setChatLines] = useState([]);
 	const [chatInput, setChatInput] = useState("");
@@ -15,6 +15,10 @@ const App = () => {
 		username: "",
 		password: ""
 	});
+
+	onlineUsersWs.onmessage = e => {
+		setOnlineUsers(JSON.parse(e.data));
+	};
 
 	const login = async e => {
 		e.preventDefault();

@@ -13,7 +13,7 @@ class ConnectionManager:
             user = services.authenticate_user(token=access_token, db=SessionLocal())
             if (websocket, user.username) not in self.connection_list:
                 self.connection_list.append((websocket, user.username))
-        except HTTPException:
+        except HTTPException as exc:
             print("Unauthorized")
             raise WebSocketDisconnect
 

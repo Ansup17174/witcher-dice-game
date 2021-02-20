@@ -1,12 +1,15 @@
 import {useState} from 'react';
 import axios from 'axios';
-const ws = new WebSocket("ws://localhost:8000/ws/online");
-ws.onmessage = e => {
+const onlineUsersWs = new WebSocket("ws://localhost:8000/ws/online");
+onlineUsersWs.onmessage = e => {
 	console.log(JSON.parse(e.data));
 };
 
 const App = () => {
 
+	const [onlineUsers, setOnlineUsers] = useState([]);
+	const [chatLines, setChatLines] = useState([]);
+	const [chatInput, setChatInput] = useState("");
 	const [userData, setUserData] = useState({})
 	const [formData, setFormData] = useState({
 		username: "",
@@ -18,7 +21,7 @@ const App = () => {
 		await axios.post("http://localhost:8000/auth/login", formData)
 		.then(response => {
 			setUserData(response.data);
-			ws.send(response.data.access_token);
+			onlineUsersWs.send(response.data.access_token);
 		})
 		.catch(error => {
 			console.log(error.response.data);
@@ -35,7 +38,7 @@ const App = () => {
 				<input type="submit" value="Login"/>
 			</form>
 			<div>
-				{/* {onlineUsers.length > 0 && onlineUsers.map((username, index) => <p key={index}>{username}</p>)} */}
+				{onlineUsers.length > 0 && onlineUsers.map((username, index) => <p key={index}>{username}</p>)}
 			</div>
 			<div>
 

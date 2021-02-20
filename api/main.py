@@ -1,4 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.websockets import WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from .websockets import ConnectionManager
 from . import models
 from .schemas import UserRegister, User, ResendEmail, UserLogin, Token
 from .database import Base, engine, SessionLocal
@@ -10,8 +13,20 @@ from uuid import UUID
 
 app = FastAPI()
 
+origins = ["http://localhost:3000"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods="*",
+    allow_headers="*"
+)
+
+
 Base.metadata.create_all(bind=engine)
 services.expired_emails_cleanup(SessionLocal())
+connection_manager = ConnectionManager()
 
 
 @app.post("/auth/register")
@@ -54,3 +69,16 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
 @app.get("/auth/user/", response_model=User)
 def get_user(user: models.User = Depends(services.authenticate_user)):
     return user
+
+
+@app.websocket("/ws/online")
+async def online_users(ws: WebSocket):
+    await ws.accept()
+    try:
+        while True:
+            access_token = await ws.receive_text()
+            await connection_manager.authorize(ws, access_token=access_token)
+            await connection_manager.send_users_list()
+    except WebSocketDisconnect:
+        await connection_manager.disconnect(ws)
+

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from .websockets import ConnectionManager
+from .websockets import OnlineUsersManager, PublicChatManager
 from . import models
 from .schemas import UserRegister, User, ResendEmail, UserLogin, Token
 from .database import Base, engine, SessionLocal
@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from . import services
 from uuid import UUID
+import json
 
 app = FastAPI()
 
@@ -26,7 +27,8 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 services.expired_emails_cleanup(SessionLocal())
-connection_manager = ConnectionManager()
+online_users_manager = OnlineUsersManager()
+public_chat_manager = PublicChatManager()
 
 
 @app.post("/auth/register")
@@ -74,13 +76,25 @@ def get_user(user: models.User = Depends(services.authenticate_user)):
 @app.websocket("/ws/online")
 async def online_users(ws: WebSocket):
     await ws.accept()
-    connection_manager.connection_list.append([ws, ""])
+    online_users_manager.connection_list.append([ws, ""])
+    await online_users_manager.send_to_one(ws)
     try:
         while True:
-            await connection_manager.send_users_list()
             access_token = await ws.receive_text()
-            await connection_manager.authorize(ws, access_token=access_token)
+            await online_users_manager.authorize(ws, access_token=access_token)
     except WebSocketDisconnect:
-        await connection_manager.disconnect(ws)
-        await connection_manager.send_users_list()
+        await online_users_manager.disconnect(ws)
+        await online_users_manager.send_to_all()
 
+
+@app.websocket("/ws/chat")
+async def public_chat(ws: WebSocket):
+    await ws.accept()
+    public_chat_manager.connection_list.append([ws, ""])
+    await public_chat_manager.send_chat_to_one(ws)
+    try:
+        while True:
+            message = await ws.receive_text()
+            await public_chat_manager.receive_message(message)
+    except WebSocketDisconnect:
+        await public_chat_manager.disconnect(ws)

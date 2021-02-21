@@ -1,14 +1,15 @@
 import {useState} from 'react';
 import axios from 'axios';
 const onlineUsersWs = new WebSocket("ws://localhost:8000/ws/online");
+const chatWs = new WebSocket("ws://localhost:8000/ws/chat");
+
 onlineUsersWs.onmessage = e => {
 	console.log(JSON.parse(e.data));
 };
 
-
 const App = () => {
 	const [onlineUsers, setOnlineUsers] = useState([]);
-	const [chatLines, setChatLines] = useState([]);
+	const [chatLines, setChatLines] = useState("");
 	const [chatInput, setChatInput] = useState("");
 	const [userData, setUserData] = useState({})
 	const [formData, setFormData] = useState({
@@ -18,6 +19,10 @@ const App = () => {
 
 	onlineUsersWs.onmessage = e => {
 		setOnlineUsers(JSON.parse(e.data));
+	};
+
+	chatWs.onmessage = e => {
+		setChatLines(e.data);
 	};
 
 	const login = async e => {
@@ -32,6 +37,16 @@ const App = () => {
 		});
 	}
 
+	const sendText = e => {
+		e.preventDefault();
+		if (!userData.id) {
+			alert("Not logged in")
+		} else {
+			chatWs.send(`${userData.username}: ${chatInput}`);
+			setChatInput("");
+		}
+	};
+
 	return (
 		<div>
 			<form onSubmit={login}>
@@ -45,7 +60,11 @@ const App = () => {
 				{onlineUsers.length > 0 && onlineUsers.map((username, index) => <p key={index}>{username}</p>)}
 			</div>
 			<div>
-
+				<textarea value={chatLines} cols="30" rows="10" disabled></textarea>
+				<form onSubmit={sendText}>
+				<input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)}/>
+				<input type="submit" value="send"/>
+				</form>
 			</div>
 		</div>
 	);

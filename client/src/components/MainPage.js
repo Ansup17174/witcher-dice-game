@@ -1,7 +1,6 @@
 import {useState, useRef, useEffect} from 'react';
+import {Link} from 'react-router-dom';
 import axios from 'axios';
-
-
 
 const MainPage = () => {
     const [onlineUsers, setOnlineUsers] = useState([]);
@@ -12,13 +11,16 @@ const MainPage = () => {
 		username: "",
 		password: ""
     });
+    const [roomList, setRoomList] = useState([]);
     
     const onlineUsersWs = useRef(null);
     const chatWs = useRef(null);
+    const roomListWs = useRef(null);
 
     useEffect(() => {
         onlineUsersWs.current = new WebSocket("ws://localhost:8000/ws/online");
         chatWs.current = new WebSocket("ws://localhost:8000/ws/chat");
+        roomListWs.current = new WebSocket("ws://localhost:8000/ws/room-list");
         
         onlineUsersWs.current.onmessage = e => {
             setOnlineUsers(JSON.parse(e.data));
@@ -27,10 +29,15 @@ const MainPage = () => {
         chatWs.current.onmessage = e => {
             setChatLines(e.data);
         };
+
+        roomListWs.current.onmessage = e => {
+            setRoomList(JSON.parse(e.data));
+        };
         
         return () => {
             onlineUsersWs.current.close();
             chatWs.current.close();
+            roomListWs.current.close();
         };
     }, []);
 
@@ -55,7 +62,17 @@ const MainPage = () => {
 			chatWs.current.send(`${userData.username}: ${chatInput}`);
 			setChatInput("");
 		}
-	};
+    };
+    
+    const createRoom = () => {
+        axios.post("http://localhost:8000/create-room", {}, {withCredentials: true, headers: {"Authorization": `Bearer ${userData.access_token}`}})
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.log(error.response.data);
+        });
+    };
 
 	return (
 		<div>
@@ -76,6 +93,14 @@ const MainPage = () => {
 				<input type="submit" value="send"/>
 				</form>
 			</div>
+            <div>
+                <div onClick={() => createRoom()}>CREATE ROOM</div>
+            </div>
+            <div>
+                <ul>
+                    {roomList.map((room, index) => <Link to={`/rooms/${room}`} key={index}><li>Room id: {room}</li></Link>)}
+                </ul>
+            </div>
 		</div>
 	);
 };

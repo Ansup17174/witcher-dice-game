@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from .websockets import OnlineUsersManager, PublicChatManager, GameManager
+from .websockets import OnlineUsersManager, PublicChatManager, RoomListManager
 from . import models
 from .schemas import UserRegister, User, ResendEmail, UserLogin, Token
 from .database import Base, engine, SessionLocal
@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from . import services
 from uuid import UUID, uuid4
+import asyncio
 import json
 
 app = FastAPI()
@@ -27,10 +28,11 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 services.expired_emails_cleanup(SessionLocal())
+
 online_users_manager = OnlineUsersManager()
 public_chat_manager = PublicChatManager()
+room_list_manager = RoomListManager()
 
-games_list = []
 
 
 @app.post("/auth/register")
@@ -75,17 +77,22 @@ def get_user(user: models.User = Depends(services.authenticate_user)):
     return user
 
 
-@app.post("/send-invite/{username}")
-def invite(username: str,
-           user: models.User = Depends(services.authenticate_user),
-           db: Session = Depends(get_db)
-           ):
-    invited_user = services.get_active_user_by_username(db=db, username=username)
-    if not invited_user:
-        raise HTTPException(detail="User not found", status_code=404)
-    game_id = str(uuid4())
-    game = GameManager(game_id)
-    games_list.append(game)
+@app.post("/create-room")
+async def create_room(user: models.User = Depends(services.authenticate_user)):
+    await room_list_manager.create_room()
+    return {"detail": "Room created!"}
+
+# @app.post("/send-invite/{username}")
+# def invite(username: str,
+#            user: models.User = Depends(services.authenticate_user),
+#            db: Session = Depends(get_db)
+#            ):
+#     invited_user = services.get_active_user_by_username(db=db, username=username)
+#     if not invited_user:
+#         raise HTTPException(detail="User not found", status_code=404)
+#     game_id = str(uuid4())
+#     game = GameManager(game_id)
+#     games_list.append(game)
 
 
 @app.websocket("/ws/online")
@@ -115,6 +122,14 @@ async def public_chat(ws: WebSocket):
         await public_chat_manager.disconnect(ws)
 
 
-@app.websocket("/ws/invitations")
-async def invitations(ws: WebSocket):
-    pass
+@app.websocket("/ws/room-list")
+async def room_list(ws: WebSocket):
+    await ws.accept()
+    room_list_manager.connection_list.append(ws)
+    await room_list_manager.send_to_one(ws)
+    try:
+        while True:
+            await asyncio.sleep(0)
+    except WebSocketDisconnect:
+        room_list_manager.connection_list.remove(ws)
+        await ws.close()

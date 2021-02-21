@@ -2,6 +2,7 @@ from fastapi.websockets import WebSocket
 from fastapi import HTTPException
 from . import services
 from .database import SessionLocal
+from uuid import uuid4
 
 
 class OnlineUsersManager:
@@ -73,19 +74,25 @@ class PublicChatManager:
         await ws.close()
 
 
-class InvitationsManager:
+class RoomListManager:
     def __init__(self):
         self.connection_list: list[WebSocket] = []
+        self.room_list: list[str] = []
 
+    async def send_to_all(self):
+        for connection in self.connection_list:
+            await connection.send_json(self.room_list)
 
+    async def send_to_one(self, ws: WebSocket):
+        await ws.send_json(self.room_list)
 
+    async def create_room(self):
+        self.room_list.append(str(uuid4()))
+        print(self.connection_list)
+        await self.send_to_all()
+        print(self.room_list)
 
-class GameManager:
-
-    def __init__(self, game_id: str):
-        self.game_id: str = game_id
-        self.game_state: dict = {
-
-        }
-
-
+    async def remove_room(self, room_id: str):
+        if room_id in self.room_list:
+            self.room_list.remove(room_id)
+            await self.send_to_all()

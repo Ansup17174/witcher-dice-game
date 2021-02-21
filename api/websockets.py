@@ -35,7 +35,6 @@ class OnlineUsersManager:
         users = [connection[1] for connection in self.connection_list if connection[1]]
         for connection in self.connection_list:
             await connection[0].send_json(users)
-            print("")
 
 
 class PublicChatManager:
@@ -72,3 +71,21 @@ class PublicChatManager:
                 self.connection_list.remove(connection)
                 break
         await ws.close()
+
+
+class InvitationsManager:
+    def __init__(self):
+        self.connection_list: list[WebSocket] = []
+
+
+
+
+class GameManager:
+
+    def __init__(self, game_id: str):
+        self.game_id: str = game_id
+        self.game_state: dict = {
+
+        }
+
+

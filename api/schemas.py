@@ -69,3 +69,12 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+class GameState(BaseModel):
+    players: list[str]
+    score: list[int]
+    dices: list[list[int]]
+    current_player: Optional[int] = 0
+    turn: int
+    deal: int

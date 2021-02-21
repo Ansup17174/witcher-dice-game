@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from .websockets import OnlineUsersManager, PublicChatManager, RoomListManager
+from .websockets import OnlineUsersManager, PublicChatManager, RoomListManager, RoomManager
 from . import models
 from .schemas import UserRegister, User, ResendEmail, UserLogin, Token
 from .database import Base, engine, SessionLocal
@@ -133,3 +133,23 @@ async def room_list(ws: WebSocket):
     except WebSocketDisconnect:
         room_list_manager.connection_list.remove(ws)
         await ws.close()
+
+
+@app.websocket("/ws/{room_id}/{access_token}")
+async def room_websocket(ws: WebSocket, room_id: str, access_token: str):
+    await ws.accept()
+    selected_room = None
+    for room in room_list_manager.room_list:
+        if room.room_id == room_id:
+            selected_room = room
+            break
+    if not selected_room:
+        await ws.close()
+    await selected_room.authorize(ws, access_token)
+    await selected_room.send_game_state()
+    try:
+        while True:
+            game_state = await ws.receive_json()
+
+    except WebSocketDisconnect:
+        await selected_room.disconnect(ws)

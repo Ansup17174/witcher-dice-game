@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 
-class User(Base):
+class UserModel(Base):
     __tablename__ = "users"
 
     id = Column(UUID(as_uuid=True), primary_key=True)
@@ -14,7 +14,7 @@ class User(Base):
     profile = relationship("UserProfile", back_populates="user", uselist=False, cascade="all, delete")
 
 
-class UserProfile(Base):
+class UserProfileModel(Base):
     __tablename__ = "userprofiles"
 
     user = relationship("User", back_populates="profile")
@@ -25,7 +25,7 @@ class UserProfile(Base):
     matches_played = Column(Integer, server_default="0", nullable=False)
 
 
-class Email(Base):
+class EmailModel(Base):
     __tablename__ = "emails"
 
     address = Column(String(100), unique=True, nullable=False)

@@ -1,10 +1,9 @@
 from pydantic import BaseModel, validator
-from typing import Optional
 from uuid import UUID
 import re
 
 
-class Email(BaseModel):
+class EmailSchema(BaseModel):
     address: str
     is_confirmed: bool
 
@@ -12,7 +11,7 @@ class Email(BaseModel):
         orm_mode = True
 
 
-class UserProfile(BaseModel):
+class UserProfileSchema(BaseModel):
     matches_won: int
     matches_lost: int
     matches_played: int
@@ -21,17 +20,17 @@ class UserProfile(BaseModel):
         orm_mode = True
 
 
-class User(BaseModel):
+class UserSchema(BaseModel):
     id: UUID
     username: str
-    email: Email
-    profile: UserProfile
+    email: EmailSchema
+    profile: UserProfileSchema
 
     class Config:
         orm_mode = True
 
 
-class UserRegister(BaseModel):
+class UserRegisterSchema(BaseModel):
     username: str
     email: str
     password: str
@@ -51,7 +50,7 @@ class UserRegister(BaseModel):
         return second_password
 
 
-class ResendEmail(BaseModel):
+class ResendEmailSchema(BaseModel):
     email: str
 
     @validator("email")
@@ -61,20 +60,11 @@ class ResendEmail(BaseModel):
         return email
 
 
-class UserLogin(BaseModel):
+class UserLoginSchema(BaseModel):
     username: str
     password: str
 
 
-class Token(BaseModel):
+class TokenSchema(BaseModel):
     access_token: str
     token_type: str
-
-
-class GameState(BaseModel):
-    players: list[str]
-    score: list[int]
-    dices: list[list[int]]
-    current_player: Optional[int] = 0
-    turn: int
-    deal: int

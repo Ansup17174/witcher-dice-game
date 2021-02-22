@@ -2,8 +2,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from string import Template
-from .models import User
-from .database import SessionLocal
+from .models import UserModel
 from . import config
 import os
 
@@ -16,7 +15,7 @@ def get_template(filename: str):
     return Template(template_file_content)
 
 
-def send_confirmation_mail(user: User):
+def send_confirmation_mail(user: UserModel):
     site = "dicegame.net"
     confirmation_url = f"http://localhost:8000/auth/confirm-email/{user.id}/{user.email.activation_token}"
     smtp = smtplib.SMTP(host=config.EMAIL_HOST, port=config.EMAIL_PORT)
@@ -37,18 +36,104 @@ def send_confirmation_mail(user: User):
     smtp.send_message(mail)
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    except Exception:
-        db.rollback()
-        raise
-    finally:
-        db.close()
+def times_in_array(n, array):  # Returns value that appears n-times in given array, works for cases below
+    for val in array:
+        if array.count(val) == n:
+            return val
 
 
+def look_for_patterns(dices):
+    unique_dices = set(dices)
+    if len(unique_dices) == 1:  # Poker
+        return 8
+    elif len(unique_dices) == 2:
+        for dice in dices:
+            if dices.count(dice) == 4:  # Kareta
+                return 7
+            elif dices.count(dice) == 2 or dices.count(dice) == 3:  # Full
+                return 6
+    elif len(unique_dices) == 3:
+        for dice in dices:
+            if dices.count(dice) == 3:  # Trojka
+                return 3
+        for dice in dices:
+            if dices.count(dice) == 1:  # Dwie pary
+                return 2
+    elif len(unique_dices) == 4:
+        for dice in dices:
+            if dices.count(dice) == 2:  # Para
+                return 1
+    elif len(unique_dices) == 5:
+        if 6 not in dices:  # Maly St
+            return 4
+        elif 1 not in dices:  # Duzy St
+            return 5
+        else:
+            return 0
 
 
-
-
+def compare_dices(dices1, dices2, pattern):
+    if dices1 == dices2:
+        return -1
+    if pattern == 8:  # Poker
+        if dices1[0] > dices2[0]:
+            return 0
+        elif dices1[0] < dices2[0]:
+            return 1
+    elif pattern == 7:  # Kareta
+        dice1 = times_in_array(4, dices1)
+        dice2 = times_in_array(4, dices2)
+        if dice1 > dice2:
+            return 0
+        elif dice2 > dice1:
+            return 1
+        elif dice1 == dice2:
+            if sum(dices1) > sum(dices2):
+                return 0
+            elif sum(dices1) < sum(dices2):
+                return 1
+    elif pattern == 6:
+        if sum(dices1) > sum(dices2):
+            return 0
+        elif sum(dices1) < sum(dices2):
+            return 1
+    elif pattern == 3:
+        dice1 = times_in_array(3, dices1)
+        dice2 = times_in_array(3, dices2)
+        if dice1 > dice2:
+            return 0
+        elif dice2 > dice1:
+            return 1
+        elif dice1 == dice2:
+            if sum(dices1) > sum(dices2):
+                return 0
+            elif sum(dices1) < sum(dices2):
+                return 1
+    elif pattern == 2:
+        single_dice1 = times_in_array(1, dices1)
+        single_dice2 = times_in_array(1, dices2)
+        dices1_twopairs = dices1[:]
+        dices1_twopairs.remove(single_dice1)
+        dices2_twopairs = dices2[:]
+        dices2_twopairs.remove(single_dice2)
+        if sum(dices1_twopairs) > sum(dices2_twopairs):
+            return 0
+        elif sum(dices1_twopairs) < sum(dices2_twopairs):
+            return 1
+        elif sum(dices1_twopairs) == sum(dices2_twopairs):
+            if single_dice1 > single_dice2:
+                return 0
+            elif single_dice2 > single_dice1:
+                return 1
+    elif pattern == 1:
+        dice1 = times_in_array(2, dices1)
+        dice2 = times_in_array(2, dices2)
+        if dice1 > dice2:
+            return 0
+        elif dice2 > dice1:
+            return 1
+        elif dice1 == dice2:
+            if sum(dices1) > sum(dices2):
+                return 0
+            elif sum(dices1) < sum(dices2):
+                return 1

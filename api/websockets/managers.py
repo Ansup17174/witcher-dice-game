@@ -119,7 +119,7 @@ class RoomManager:
 
     async def send_game_state(self):
         for connection in self.connection_list:
-            await connection[0].send_json(self.game_state)
+            await connection[0].send_json(self.game_state.dict())
 
     async def roll_dices(self, player_index: int = None, chosen_dices: list[int] = None):
         if chosen_dices is None:

@@ -1,15 +1,13 @@
 from fastapi import APIRouter, Depends
 from fastapi.websockets import WebSocket, WebSocketDisconnect
-from ..websockets.managers import (OnlineUsersManager, PublicChatManager, RoomListManager,
-                                   RoomManager)
+from ..websockets.managers import OnlineUsersManager, PublicChatManager, RoomListManager
 from ..services import user_service
 from ..models import UserModel
 import asyncio
 
 game_router = APIRouter(
     prefix="/game",
-    tags=['game'],
-    dependencies=[Depends(user_service.authenticate_user)]
+    tags=['game']
 )
 
 online_users_manager = OnlineUsersManager()
@@ -18,7 +16,7 @@ room_list_manager = RoomListManager()
 
 
 @game_router.post("/create-room")
-async def create_room(user: UserModel):
+async def create_room(user: UserModel = Depends(user_service.authenticate_user)):
     await room_list_manager.create_room()
     return {"detail": "Room created!"}
 
@@ -63,7 +61,7 @@ async def room_list(ws: WebSocket):
         await ws.close()
 
 
-@game_router.websocket("/ws/{room_id}/{access_token}")
+@game_router.websocket("/ws/room/{room_id}/{access_token}")
 async def room_websocket(ws: WebSocket, room_id: str, access_token: str):
     await ws.accept()
     selected_room = None
@@ -71,19 +69,14 @@ async def room_websocket(ws: WebSocket, room_id: str, access_token: str):
         if room.room_id == room_id:
             selected_room = room
             break
-    if not selected_room:
+    if selected_room is None:
         await ws.close()
     await selected_room.authorize(ws, access_token)
     await selected_room.send_game_state()
     try:
         while True:
             data = await ws.receive_json()
+            print(data)
             await selected_room.dispatch(data, ws)
     except WebSocketDisconnect:
         await selected_room.disconnect(ws)
-
-#
-# data = {
-#     'action': 'roll',
-#     'dices': [1, 2, 3]
-# }

@@ -2,17 +2,25 @@ import {useState, useRef, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
 
+
 const MainPage = () => {
     const [onlineUsers, setOnlineUsers] = useState([]);
 	const [chatLines, setChatLines] = useState("");
 	const [chatInput, setChatInput] = useState("");
-	const [userData, setUserData] = useState({})
+	const [userData, setUserData] = useState({
+		id: "",
+		username: "",
+		email: {
+			address: "",
+			is_confirmed: true
+		},
+		access_token: ""
+	})
 	const [formData, setFormData] = useState({
 		username: "",
 		password: ""
     });
     const [roomList, setRoomList] = useState([]);
-    
     const onlineUsersWs = useRef(null);
     const chatWs = useRef(null);
     const roomListWs = useRef(null);
@@ -41,7 +49,6 @@ const MainPage = () => {
         };
     }, []);
 
-
 	const login = async e => {
 		e.preventDefault();
 		await axios.post("http://localhost:8000/auth/login", formData)
@@ -63,9 +70,9 @@ const MainPage = () => {
 			setChatInput("");
 		}
     };
-    
+
     const createRoom = () => {
-        axios.post("http://localhost:8000/create-room", {}, {withCredentials: true, headers: {"Authorization": `Bearer ${userData.access_token}`}})
+        axios.post("http://localhost:8000/game/create-room", {}, {withCredentials: true, headers: {"Authorization": `Bearer ${userData.access_token}`}})
         .then(response => {
             console.log(response.data);
         })
@@ -76,6 +83,7 @@ const MainPage = () => {
 
 	return (
 		<div>
+			<h3>Logged as: {userData.username}</h3>
 			<form onSubmit={login}>
 				<input type="text" placeholder="username" value={formData.username}
 				onChange={e => setFormData({...formData, username: e.target.value})}/>
@@ -98,7 +106,7 @@ const MainPage = () => {
             </div>
             <div>
                 <ul>
-                    {roomList.map((room, index) => <Link to={`/rooms/${room}`} key={index}><li>Room id: {room}</li></Link>)}
+                    {roomList.map((room, index) => <Link to={`/room/${room}/${userData.access_token}`} key={index}><li>Room id: {room}</li></Link>)}
                 </ul>
             </div>
 		</div>

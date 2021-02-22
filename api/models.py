@@ -9,15 +9,15 @@ class UserModel(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True)
     username = Column(String(50), unique=True, nullable=False)
-    email = relationship("Email", back_populates="user", uselist=False, cascade="all, delete")
+    email = relationship("EmailModel", back_populates="user", uselist=False, cascade="all, delete")
     password = Column(String(100), nullable=False)
-    profile = relationship("UserProfile", back_populates="user", uselist=False, cascade="all, delete")
+    profile = relationship("UserProfileModel", back_populates="user", uselist=False, cascade="all, delete")
 
 
 class UserProfileModel(Base):
     __tablename__ = "userprofiles"
 
-    user = relationship("User", back_populates="profile")
+    user = relationship("UserModel", back_populates="profile")
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
 
     matches_won = Column(Integer, server_default="0", nullable=False)
@@ -33,6 +33,6 @@ class EmailModel(Base):
     is_confirmed = Column(Boolean, default=False)
     expiry_date = Column(DateTime, nullable=True)
 
-    user = relationship("User", back_populates="email")
+    user = relationship("UserModel", back_populates="email")
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
 

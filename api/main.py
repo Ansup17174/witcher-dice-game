@@ -7,8 +7,6 @@ from .services import user_service
 
 
 app = FastAPI()
-app.include_router(user_router)
-app.include_router(game_router)
 
 origins = ["http://localhost:3000"]
 
@@ -19,6 +17,9 @@ app.add_middleware(
     allow_methods="*",
     allow_headers="*"
 )
+
+app.include_router(user_router)
+app.include_router(game_router)
 
 Base.metadata.create_all(bind=engine)
 user_service.expired_emails_cleanup(SessionLocal())

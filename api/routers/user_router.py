@@ -13,12 +13,11 @@ from uuid import UUID
 user_router = APIRouter(
     prefix="/auth",
     tags=['user'],
-    dependencies=[Depends(get_db), Depends(user_service.authenticate_user)]
 )
 
 
 @user_router.post("/register")
-def register(data: UserRegisterSchema, db: Session):
+def register(data: UserRegisterSchema, db: Session = Depends(get_db)):
     try:
         user_service.register_user(db=db, user_data=data)
         return {"detail": "Confirmation email sent"}
@@ -27,7 +26,7 @@ def register(data: UserRegisterSchema, db: Session):
 
 
 @user_router.post("/resend-verification-email")
-def resend(email_data: ResendEmailSchema, db: Session):
+def resend(email_data: ResendEmailSchema, db: Session = Depends(get_db)):
     try:
         user_service.resend_verification_email(db=db, email=email_data.email)
         return {"detail": "Confirmation email sent"}
@@ -37,13 +36,13 @@ def resend(email_data: ResendEmailSchema, db: Session):
 
 
 @user_router.get("/confirm-email/{user_id}/{token}")
-def confirm_email(user_id: UUID, token: str, db: Session):
+def confirm_email(user_id: UUID, token: str, db: Session = Depends(get_db)):
     user_service.confirm_email(db=db, user_id=user_id, token=token)
     return {"detail": "Email confirmed successfully"}
 
 
 @user_router.post("/login")
-def login(data: UserLoginSchema, db: Session):
+def login(data: UserLoginSchema, db: Session = Depends(get_db)):
     user = user_service.login_user(**data.dict(), db=db)
     if not user:
         raise auth_exception
@@ -55,5 +54,5 @@ def login(data: UserLoginSchema, db: Session):
 
 
 @user_router.get("user/", response_model=UserSchema)
-def get_user(user: UserModel):
+def get_user(user: UserModel = Depends(user_service.authenticate_user)):
     return user

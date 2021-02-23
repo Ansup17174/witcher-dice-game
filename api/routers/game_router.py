@@ -57,8 +57,7 @@ async def room_list(ws: WebSocket):
         while True:
             await asyncio.sleep(0)
     except WebSocketDisconnect:
-        room_list_manager.connection_list.remove(ws)
-        await ws.close()
+        await room_list_manager.disconnect(ws)
 
 
 @game_router.websocket("/ws/room/{room_id}/{access_token}")
@@ -66,7 +65,7 @@ async def room_websocket(ws: WebSocket, room_id: str, access_token: str):
     await ws.accept()
     selected_room = None
     for room in room_list_manager.room_list:
-        if room.room_id == room_id:
+        if room.room_id == room_id and not room.game_state.is_finished:
             selected_room = room
             break
     if selected_room is None:
@@ -76,7 +75,6 @@ async def room_websocket(ws: WebSocket, room_id: str, access_token: str):
     try:
         while True:
             data = await ws.receive_json()
-            print(data)
             await selected_room.dispatch(data, ws)
     except WebSocketDisconnect:
         await selected_room.disconnect(ws)

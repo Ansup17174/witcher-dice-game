@@ -11,3 +11,5 @@ class GameStateSchema(BaseModel):
     turn: int
     deal: int
     is_finished: bool
+    winner: Optional[int] = None
+    ready: list[bool, bool]

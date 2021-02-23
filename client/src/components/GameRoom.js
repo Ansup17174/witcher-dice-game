@@ -19,7 +19,9 @@ const GameRoom = () => {
         current_player: 0,
         turn: 1,
         deal: 1,
-        is_finished: false
+        is_finished: false,
+        winner: null,
+        ready: [false, false]
     });
     const roomWs = useRef(null);
 
@@ -35,6 +37,9 @@ const GameRoom = () => {
 
     const rollDices = e => {
         e.preventDefault();
+        if (!dicesToRoll.length) {
+            return;
+        }
         const data = {
             action: "roll",
             dices: dicesToRoll.split(" ").map(string => Number.parseInt(string))
@@ -47,26 +52,48 @@ const GameRoom = () => {
         roomWs.current.send(JSON.stringify({action: 'pass'}));
     };
 
+    const ready = () => {
+        const data = {
+            action: 'ready'
+        };
+        roomWs.current.send(JSON.stringify(data));
+    };
+
     return (
         <div>
             <h3>Logged as {sub}</h3>
             <h3>Players: {gameState.players[0]}, {gameState.players[1]}</h3>
-            <h3>Current player: {gameState.players[gameState.current_player]}</h3>
+            {gameState.ready[0] && gameState.ready[1] && <h3>Current player: {gameState.players[gameState.current_player]}</h3>}
             <h4>Score: {gameState.score[0]}-{gameState.score[1]}</h4>
             <div>
-                <h5>Player 1 dices: {JSON.stringify(gameState.dices[0])}</h5>
+                <h5>{gameState.players[0]} dices: {JSON.stringify(gameState.dices[0])}</h5>
                 <h5>Pattern: {patterns[gameState.dices_value[0]]}</h5>
             </div>
             <div>
-                <h5>Player 2 dices: {JSON.stringify(gameState.dices[1])}</h5>
+                <h5>{gameState.players[1]} dices: {JSON.stringify(gameState.dices[1])}</h5>
                 <h5>Pattern: {patterns[gameState.dices_value[1]]}</h5>
             </div>
-            {gameState.players[gameState.current_player] === sub && <div><form onSubmit={rollDices}>
+            {!gameState.is_finished && gameState.players[gameState.current_player] === sub && gameState.ready[0] && gameState.ready[1] && 
+                <div>
+                <form onSubmit={rollDices}>
                 <input type="text" value={dicesToRoll} onChange={e => setDicesToRoll(e.target.value)}/>
                 <input type="submit" value="Roll"/>
-            </form>
-            <input type="submit" value="Pass" onClick={pass}/>
+                </form>
+                <input type="submit" value="Pass" onClick={pass}/>
             </div>}
+            {!gameState.is_finished && !gameState.ready[gameState.players.indexOf(sub)] && <input type="submit" value="Ready" onClick={ready}/>}
+            {(!gameState.ready[0] || !gameState.ready[1]) && <div>
+                    {gameState.ready[0] && <h4>Player 1 ready</h4>}
+                    {gameState.ready[1] && <h4>Player 2 ready</h4>}
+                </div>}
+            <div>
+                <h3>Turn: {gameState.turn}</h3>
+                <h3>Deal: {gameState.deal}</h3>
+            </div>
+            <div>
+                {gameState.score[0] === 2 && <h1>Player 1 wins</h1>}
+                {gameState.score[1] === 2 && <h1>Player 2 wins</h1>}
+            </div>
         </div>
     );
 };

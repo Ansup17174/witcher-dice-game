@@ -1,4 +1,5 @@
 from fastapi.websockets import WebSocket
+from websockets.exceptions import ConnectionClosed
 from fastapi import HTTPException
 from ..services import user_service
 from ..models import UserModel
@@ -35,7 +36,6 @@ class OnlineUsersManager:
         for connection in self.connection_list:
             if connection[0] is ws:
                 self.connection_list.remove(connection)
-        await ws.close()
 
     async def send_to_one(self, ws: WebSocket):
         users = [connection[1] for connection in self.connection_list if connection[1]]
@@ -44,7 +44,10 @@ class OnlineUsersManager:
     async def send_to_all(self):
         users = [connection[1] for connection in self.connection_list if connection[1]]
         for connection in self.connection_list:
-            await connection[0].send_json(users)
+            try:
+                await connection[0].send_json(users)
+            except ConnectionClosed:
+                pass
 
 
 class PublicChatManager:
@@ -60,7 +63,10 @@ class PublicChatManager:
 
     async def send_chat_to_all(self):
         for connection in self.connection_list:
-            await connection[0].send_text("\n".join(self.chat_state))
+            try:
+                await connection[0].send_text("\n".join(self.chat_state))
+            except ConnectionClosed:
+                pass
 
     async def receive_message(self, message: str):
         self.chat_state.append(message)
@@ -74,7 +80,6 @@ class PublicChatManager:
             if connection[0] is ws:
                 self.connection_list.remove(connection)
                 break
-        await ws.close()
 
 
 class RoomManager:
@@ -92,7 +97,8 @@ class RoomManager:
             "current_player": 0,
             "turn": 1,
             "deal": 1,
-            "is_finished": False
+            "is_finished": False,
+            "ready": [False, False]
         })
 
     async def authorize(self, ws: WebSocket, access_token: str):
@@ -101,8 +107,6 @@ class RoomManager:
             if len(self.game_state.players) < 2:
                 self.game_state.players.append(user.username)
                 self.connection_list.append([ws, user])
-                if len(self.game_state.players) == 2:
-                    await self.initialize_game()
             elif user.username in self.game_state.players:
                 self.connection_list.append([ws, user])
             else:
@@ -114,12 +118,13 @@ class RoomManager:
         for connection in self.connection_list:
             if connection[0] is ws:
                 self.connection_list.remove(connection)
-        await ws.close()
-        await self.send_game_state()
 
     async def send_game_state(self):
         for connection in self.connection_list:
-            await connection[0].send_json(self.game_state.dict())
+            try:
+                await connection[0].send_json(self.game_state.dict())
+            except ConnectionClosed:
+                pass
 
     async def roll_dices(self, player_index: int = None, chosen_dices: list[int] = None):
         if chosen_dices is None:
@@ -141,6 +146,7 @@ class RoomManager:
         self.game_state.current_player = 0
 
     async def finish_game(self, db: Session = SessionLocal()):
+        self.game_state.is_finished = True
         await self.send_game_state()
         winner_index = 0 if self.game_state.score[0] > self.game_state.score[1] else 1
         loser_index = 0 if winner_index == 1 else 1
@@ -160,7 +166,6 @@ class RoomManager:
         db.commit()
         for connection in self.connection_list:
             await connection[0].close()
-        del self
 
     async def get_user(self, ws: WebSocket):
         user = None
@@ -171,39 +176,56 @@ class RoomManager:
         return user
 
     async def dispatch(self, data: dict, ws: WebSocket):
+        if self.game_state.is_finished:
+            return
         user = await self.get_user(ws)
         if not user:
+            await self.send_game_state()
             return
         player_index = self.game_state.players.index(user.username)
-        if player_index != self.game_state.current_player:
-            return
-        actions = ['roll', 'pass', 'surrender', 'tie']
+        actions = ['roll', 'pass', 'surrender', 'tie', 'ready']
         action = data.get('action')
         if action not in actions:
+            await self.send_game_state()
+            return
+        if action == 'ready' and self.game_state.ready != [True, True]:
+            self.game_state.ready[player_index] = True
+            if self.game_state.ready == [True, True]:
+                await self.initialize_game()
+            await self.send_game_state()
+            return
+        if player_index != self.game_state.current_player:
+            await self.send_game_state()
+            return
+        if not self.game_state.ready[0] and not self.game_state.ready[1]:
+            await self.send_game_state()
             return
         if action == 'roll':
             chosen_dices = data.get('dices')
             await self.roll_dices(player_index=player_index, chosen_dices=chosen_dices)
         elif action == 'pass':
-            pass
+            await self.send_game_state()
         self.game_state.turn += 1
         if self.game_state.turn == 5:
+            self.game_state.turn = 1
             self.game_state.deal += 1
+            self.game_state.ready = [False, False]
             if self.game_state.dices_value[0] > self.game_state.dices_value[1]:
                 self.game_state.score[0] += 1
             elif self.game_state.dices_value[0] < self.game_state.dices_value[1]:
-                self.game_state.dices_value[1] += 1
+                self.game_state.score[1] += 1
             else:
                 winning_index = compare_dices(
                     self.game_state.dices[0],
                     self.game_state.dices[1],
                     self.game_state.dices_value[0]
                 )
-                self.game_state.score[winning_index] += 1
-            await self.reset_dices()
-        if self.game_state.deal == 4:
+                if winning_index >= 0:
+                    self.game_state.score[winning_index] += 1
+        if self.game_state.score[0] == 2 or self.game_state.score[1] == 2:
             await self.finish_game()
         self.game_state.current_player = 0 if self.game_state.current_player == 1 else 1
+        await self.send_game_state()
 
 
 class RoomListManager:
@@ -214,7 +236,10 @@ class RoomListManager:
     async def send_to_all(self):
         room_ids = [room.room_id for room in self.room_list]
         for connection in self.connection_list:
-            await connection.send_json(room_ids)
+            try:
+                await connection.send_json(room_ids)
+            except ConnectionClosed:
+                self.connection_list.remove(connection)
 
     async def send_to_one(self, ws: WebSocket):
         room_ids = [room.room_id for room in self.room_list]
@@ -231,3 +256,6 @@ class RoomListManager:
                 self.room_list.remove(room_manager)
                 break
         await self.send_to_all()
+
+    async def disconnect(self, ws: WebSocket):
+        self.connection_list.remove(ws)

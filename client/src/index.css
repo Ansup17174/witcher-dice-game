@@ -4,3 +4,19 @@
   box-sizing: border-box;
 }
 
+body {
+  background-color: rgb(30, 30, 30);
+  font-family: sans-serif;
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px rgb(33, 33, 33) inset;
+  -webkit-text-fill-color: white;
+
+}
+#root {
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  align-items: center;
+}

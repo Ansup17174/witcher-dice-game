@@ -144,6 +144,7 @@ class RoomManager:
     async def initialize_game(self):
         await self.reset_dices()
         self.game_state.current_player = 0
+        self.game_state.deal_result = ""
 
     async def finish_game(self, db: Session = SessionLocal()):
         self.game_state.is_finished = True
@@ -212,8 +213,10 @@ class RoomManager:
             self.game_state.ready = [False, False]
             if self.game_state.dices_value[0] > self.game_state.dices_value[1]:
                 self.game_state.score[0] += 1
+                self.game_state.deal_result = "Player 1 gets the point"
             elif self.game_state.dices_value[0] < self.game_state.dices_value[1]:
                 self.game_state.score[1] += 1
+                self.game_state.deal_result = "Player 2 gets the point"
             else:
                 winning_index = compare_dices(
                     self.game_state.dices[0],
@@ -222,6 +225,7 @@ class RoomManager:
                 )
                 if winning_index >= 0:
                     self.game_state.score[winning_index] += 1
+                    self.game_state.deal_result = f"Player {str(winning_index+1)} gets the point"
         if self.game_state.score[0] == 2 or self.game_state.score[1] == 2:
             await self.finish_game()
         self.game_state.current_player = 0 if self.game_state.current_player == 1 else 1

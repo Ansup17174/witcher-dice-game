@@ -21,7 +21,8 @@ const GameRoom = () => {
         deal: 1,
         is_finished: false,
         winner: null,
-        ready: [false, false]
+        ready: [false, false],
+        deal_result: ""
     });
     const roomWs = useRef(null);
 
@@ -91,11 +92,12 @@ const GameRoom = () => {
                 <h3>Deal: {gameState.deal}</h3>
             </div>
             <div>
+                {gameState.deal_result && <h1>{gameState.deal_result}</h1>}
                 {gameState.score[0] === 2 && <h1>Player 1 wins</h1>}
                 {gameState.score[1] === 2 && <h1>Player 2 wins</h1>}
             </div>
         </div>
     );
-};
+}; 
 
 export default GameRoom;

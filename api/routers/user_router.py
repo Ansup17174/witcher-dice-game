@@ -53,6 +53,6 @@ def login(data: UserLoginSchema, db: Session = Depends(get_db)):
     return {**user_response.dict(), **token.dict()}
 
 
-@user_router.get("user/", response_model=UserSchema)
+@user_router.get("/user", response_model=UserSchema)
 def get_user(user: UserModel = Depends(user_service.authenticate_user)):
     return user

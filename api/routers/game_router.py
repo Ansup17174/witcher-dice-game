@@ -69,7 +69,7 @@ async def room_websocket(ws: WebSocket, room_id: str, access_token: str):
             selected_room = room
             break
     if selected_room is None:
-        await ws.close()
+        raise WebSocketDisconnect
     await selected_room.authorize(ws, access_token)
     await selected_room.send_game_state()
     try:

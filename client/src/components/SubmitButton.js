@@ -9,7 +9,7 @@ const SubmitButton = styled.input`
     outline: none;
     border: none;
     cursor: pointer;
-    transition: linear 0.25s;
+    transition: linear 0.4s;
 
     &:hover {
         background-color: rgb(75, 245, 66);

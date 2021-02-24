@@ -38,7 +38,7 @@ class UserRegisterSchema(BaseModel):
     password2: str
 
     @validator("email")
-    def validate_email(cls, email):
+    def validate_email(cls, email, values, **kwargs):
         if not re.match(r"[a-zA-Z0-9.]+@[a-zA-Z]+\.[a-z]+", email):
             raise ValueError("Invalid email address")
         return email
@@ -53,8 +53,7 @@ class UserRegisterSchema(BaseModel):
 
     @validator("password2")
     def validate_passwords(cls, password2, values):
-        password1 = values['password1']
-        if password1 != password2:
+        if 'password1' in values and values['password1'] != password2:
             raise ValueError("Password are not same")
         return password2
 

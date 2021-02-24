@@ -20,6 +20,7 @@ user_router = APIRouter(
 @user_router.post("/register")
 def register(data: UserRegisterSchema, db: Session = Depends(get_db)):
     try:
+        print(data)
         user_service.register_user(db=db, user_data=data)
         return {"detail": "Confirmation email sent"}
     except IntegrityError as exc:

@@ -5,6 +5,7 @@ import Form from './Form';
 import FormHeader from './FormHeader';
 import FormField from './FormField';
 import FormText from './FormText';
+import FormError from './FormError';
 import FormLink from './FormLink';
 import GlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
@@ -42,7 +43,7 @@ const LoginForm = () => {
                     <Input type="password" required value={password} onChange={e => setPassword(e.target.value)}/>
                 </FormField>
                 <FormLink to="/register">Dont have an account?</FormLink>
-                {error && <FormText>Unable to login with given credentials</FormText>}
+                {error && <FormError>Unable to login with given credentials</FormError>}
             <SubmitButton type="submit" value="Login"/>
         </Form>
     );

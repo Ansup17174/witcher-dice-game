@@ -5,6 +5,7 @@ import RegisterPage from './pages/RegisterPage';
 import NotFound from './pages/NotFound';
 import GlobalContext from './GlobalContext';
 import apiClient from './apiclient';
+import ConfirmEmail from './pages/ConfirmEmail';
 import 'react-notifications/lib/notifications.css';
 import {NotificationManager, NotificationContainer} from 'react-notifications';
 
@@ -52,6 +53,7 @@ const App = () => {
 					<Switch>
 						<Route path="/" component={Main} exact />
 						<Route path="/register" component={RegisterPage} exact />
+						<Route path="/confirm-email/:user_id/:token" component={ConfirmEmail} exact />
 						<Route path="*" component={NotFound} exact />
 					</Switch>
 			</Router>

@@ -1,9 +1,8 @@
 import styled from 'styled-components';
+import FormText from './FormText';
 
-const FormError = styled.div`
-    color: white;
-    text-align: center;
-    width: 60%;
+const FormError = styled(FormText)`
+    color: red;
 `;
 
 export default FormError;

@@ -29,7 +29,7 @@ def expired_emails_cleanup(db: Session):
 
 
 def register_user(db: Session, user_data: UserRegisterSchema):
-    hashed_password = password_context.hash(user_data.password)
+    hashed_password = password_context.hash(user_data.password1)
     user_model = UserModel(id=uuid4(), username=user_data.username, password=hashed_password)
     db.add(user_model)
     email_token = str(uuid4())

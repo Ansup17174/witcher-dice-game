@@ -4,25 +4,45 @@ import SubmitButton from './SubmitButton';
 import Form from './Form';
 import FormHeader from './FormHeader';
 import FormField from './FormField';
-import FormError from './FormError';
+import FormText from './FormText';
+import FormLink from './FormLink';
 import GlobalContext from '../GlobalContext';
+import apiClient from '../apiclient';
 
 
-let LoginForm = () => {
+const LoginForm = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
+    const {getUserData, NotificationManager} = useContext(GlobalContext);
+
+    const login = e => {
+        e.preventDefault();
+        apiClient.post("/auth/login", {username, password})
+        .then(response => {
+            localStorage.setItem("dice-token", response.data.access_token);
+            getUserData();
+            setError(false);
+            NotificationManager.success(`Succesfully logged in as ${response.data.username}`, "Logged in", 2000);
+        })
+        .catch(error => {
+            setError(true);
+        });
+    };
 
     return (
-        <Form>
+        <Form onSubmit={login}>
             <FormHeader>Login</FormHeader>
                 <FormField>
-                    <Input type="text" placeholder="Username"/>
+                    <FormText>Username</FormText>
+                    <Input type="text" required value={username} onChange={e => setUsername(e.target.value)}/>
                 </FormField>
                 <FormField>
-                    <Input type="password" placeholder="Password"/>
+                    <FormText>Password</FormText>
+                    <Input type="password" required value={password} onChange={e => setPassword(e.target.value)}/>
                 </FormField>
-                {error && <FormError>Unable to login with given credentials</FormError>}
+                <FormLink to="/register">Dont have an account?</FormLink>
+                {error && <FormText>Unable to login with given credentials</FormText>}
             <SubmitButton type="submit" value="Login"/>
         </Form>
     );

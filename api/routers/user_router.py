@@ -8,7 +8,8 @@ from ..exceptions import auth_exception
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from uuid import UUID
-
+from psycopg2.errors import UniqueViolation
+import re
 
 user_router = APIRouter(
     prefix="/auth",
@@ -22,7 +23,15 @@ def register(data: UserRegisterSchema, db: Session = Depends(get_db)):
         user_service.register_user(db=db, user_data=data)
         return {"detail": "Confirmation email sent"}
     except IntegrityError as exc:
-        raise HTTPException(detail=exc.orig.args[0], status_code=400)
+        try:
+            raise exc.orig
+        except UniqueViolation as exception:
+            found = re.search(r"\((\w+)\)=\(([a-zA-Z0-9@._-]+)\)", exception.pgerror)
+            column_name = found.group(1)
+            raise HTTPException(
+                detail=f"User with this {column_name} already exists",
+                status_code=400
+            )
 
 
 @user_router.post("/resend-verification-email")

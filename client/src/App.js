@@ -1,9 +1,12 @@
 import {useState, useEffect} from 'react';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import Main from './pages/Main';
-import NotFound from './components/NotFound';
+import RegisterPage from './pages/RegisterPage';
+import NotFound from './pages/NotFound';
 import GlobalContext from './GlobalContext';
 import apiClient from './apiclient';
+import 'react-notifications/lib/notifications.css';
+import {NotificationManager, NotificationContainer} from 'react-notifications';
 
 
 const App = () => {
@@ -43,10 +46,12 @@ const App = () => {
 	}, []);
 
 	return (
-		<GlobalContext.Provider value={{userData, setUserData}}>
+		<GlobalContext.Provider value={{userData, getUserData, NotificationManager}}>
+			<NotificationContainer />
 			<Router>
 					<Switch>
 						<Route path="/" component={Main} exact />
+						<Route path="/register" component={RegisterPage} exact />
 						<Route path="*" component={NotFound} exact />
 					</Switch>
 			</Router>

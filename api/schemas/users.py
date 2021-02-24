@@ -1,6 +1,7 @@
 from pydantic import BaseModel, validator
 from uuid import UUID
 import re
+import string
 
 
 class EmailSchema(BaseModel):
@@ -33,8 +34,8 @@ class UserSchema(BaseModel):
 class UserRegisterSchema(BaseModel):
     username: str
     email: str
-    password: str
-    second_password: str
+    password1: str
+    password2: str
 
     @validator("email")
     def validate_email(cls, email):
@@ -42,12 +43,20 @@ class UserRegisterSchema(BaseModel):
             raise ValueError("Invalid email address")
         return email
 
-    @validator("second_password")
-    def validate_passwords(cls, second_password, values):
-        password = values['password']
-        if password != second_password:
+    @validator("password1")
+    def validate_password(cls, password1):
+        if len(password1) < 8:
+            raise ValueError("Password must be at least 8 characters long")
+        if len(password1) > 32:
+            raise ValueError("Password must be at most 32 characters long")
+        return password1
+
+    @validator("password2")
+    def validate_passwords(cls, password2, values):
+        password1 = values['password1']
+        if password1 != password2:
             raise ValueError("Password are not same")
-        return second_password
+        return password2
 
 
 class ResendEmailSchema(BaseModel):

@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
-from ..schemas.users import UserRegisterSchema
+from ..schemas.users import UserRegisterSchema, ChangePasswordSchema
 from uuid import uuid4, UUID
 from .. import config
 from ..models import UserModel, EmailModel, UserProfileModel
@@ -91,6 +91,11 @@ def confirm_email(db: Session, user_id: UUID, token: str):
         raise HTTPException(detail="Invalid activation token", status_code=400)
     email_model.activation_token = ""
     email_model.is_confirmed = True
+    db.commit()
+
+
+def change_password(db: Session, data: ChangePasswordSchema, user: UserModel):
+    user.password = password_context.hash(data.new_password1)
     db.commit()
 
 

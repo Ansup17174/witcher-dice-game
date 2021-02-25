@@ -7,11 +7,11 @@ export const Form = styled.form`
     align-items: center;
     justify-content: space-evenly;
     background-color: rgb(50, 50, 50);
-    min-height: 450px;
+    min-height: 300px;
     width: 30%;
     padding: 50px 0;
+    margin: 50px 0;
 `;
-
 
 export const FormField = styled.div`
     margin: 10px 0;

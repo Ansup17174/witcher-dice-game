@@ -1,4 +1,4 @@
-import {Form, FormField, FormHeader, Input, SubmitButton, FormError} from './form';
+import {Form, FormField, FormHeader, Input, SubmitButton, FormError, FormText} from './form';
 import {useState, useContext} from 'react';
 import GlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
@@ -25,8 +25,9 @@ const ResendForm = () => {
 
     return (
         <Form onSubmit={reSend}>
+            <FormHeader>Re-send verification e-mail</FormHeader>
             <FormField>
-                <FormHeader>E-mail</FormHeader>
+                <FormText>E-mail</FormText>
                 <Input type="email" value={email} onChange={e => setEmail(e.target.value)}/>
                 <FormError>{error}</FormError>
             </FormField>

@@ -2,6 +2,7 @@ import {useReducer, useContext, useState} from 'react';
 import {Form, FormHeader, FormField, FormError, FormText, Input, FormLink, SubmitButton} from './form';
 import GlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
+import parseErrors from '../errorParser';
 
 
 const RegisterForm = () => {
@@ -46,15 +47,7 @@ const RegisterForm = () => {
             );
         })
         .catch(error => {
-            const errorObject = {};
-            if (Array.isArray(error.response.data.detail)) {
-                error.response.data.detail.forEach(error => {
-                    errorObject[error.loc[1]] = error.msg;
-                });
-                setErrors(errorObject);
-            } else {
-                setErrors(error.response.data);
-            }
+            parseErrors(error, setErrors);
         });
     };
 

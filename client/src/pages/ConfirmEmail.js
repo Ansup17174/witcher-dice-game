@@ -1,6 +1,6 @@
 import {useParams} from 'react-router-dom';
 import {useState, useEffect} from 'react';
-import Container from '../components/Container';
+import {Container} from '../components/containers';
 import Header from '../components/Header';
 import {FormLink} from '../components/form';
 import apiClient from '../apiclient';

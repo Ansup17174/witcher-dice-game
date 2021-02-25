@@ -3,12 +3,14 @@ from ..database import get_db
 from ..services import user_service
 from ..models import UserModel
 from ..schemas.users import (UserRegisterSchema, UserLoginSchema,
-                             ResendEmailSchema, UserSchema, TokenSchema)
+                             ResendEmailSchema, UserSchema, TokenSchema,
+                             ChangePasswordSchema)
 from ..exceptions import auth_exception, get_unique_violation_exception
+from ..config import password_context
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from uuid import UUID
-import re
+
 
 user_router = APIRouter(
     prefix="/auth",
@@ -19,7 +21,6 @@ user_router = APIRouter(
 @user_router.post("/register")
 def register(data: UserRegisterSchema, db: Session = Depends(get_db)):
     try:
-        print(data)
         user_service.register_user(db=db, user_data=data)
         return {"detail": "Confirmation email sent"}
     except IntegrityError as exc:
@@ -36,6 +37,18 @@ def resend(email_data: ResendEmailSchema, db: Session = Depends(get_db)):
 def confirm_email(user_id: UUID, token: str, db: Session = Depends(get_db)):
     user_service.confirm_email(db=db, user_id=user_id, token=token)
     return {"detail": "Email confirmed successfully"}
+
+
+@user_router.post("/change-password")
+def change_password(
+        data: ChangePasswordSchema,
+        user: UserModel = Depends(user_service.authenticate_user),
+        db: Session = Depends(get_db)
+        ):
+    if not password_context.verify(data.old_password, user.password):
+        raise HTTPException(detail="Incorrect password", status_code=400)
+    user_service.change_password(db=db, data=data, user=user)
+    return {"detail": "Password changed!"}
 
 
 @user_router.post("/login")

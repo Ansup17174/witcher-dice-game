@@ -3,7 +3,9 @@ import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 import NotFound from './pages/NotFound';
+import ProfilePage from './pages/ProfilePage';
 import GlobalContext from './GlobalContext';
 import apiClient from './apiclient';
 import ConfirmEmail from './pages/ConfirmEmail';
@@ -32,6 +34,7 @@ const App = () => {
 		}
 	});
 	const onlineUsersWs = useRef(null);
+
 	const sleep = ms => {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	};
@@ -44,10 +47,15 @@ const App = () => {
 			await apiClient.get("/auth/user", {withCredentials: true, headers: {"Authorization": `Bearer ${token}`}})
 			.then(response => {
 				setUserData(response.data);
-				onlineUsersWs.current.send(token);
+				if (onlineUsersWs.current.readyState === 1) {
+					onlineUsersWs.current.send(token);
+				}
 			})
 			.catch(error => {
+				console.log(error);
 				setUserData({});
+				console.log(token);
+				console.log("wtf");
 				localStorage.removeItem("dice-token");
 			});
 		}
@@ -55,8 +63,6 @@ const App = () => {
 
 	const init = async () => {
 		getUserData();
-		onlineUsersWs.current = new WebSocket(webSocketBase + "/online");
-		onlineUsersWs.current.onmessage = message => setOnlineUsers(JSON.parse(message.data));
 		await sleep(250);
 		setLoading(false);
 		return () => {
@@ -65,19 +71,23 @@ const App = () => {
 	};
 
 	useEffect(() => {
+		onlineUsersWs.current = new WebSocket(webSocketBase + "/online");
+		onlineUsersWs.current.onmessage = message => setOnlineUsers(JSON.parse(message.data));
 		init();
 	}, []);
 
 	return (
 		<GlobalContext.Provider value={{userData, setUserData, getUserData, NotificationManager, webSocketBase}}>
-			<NotificationContainer />
 			<LoadingPage loading={loading}>Loading...</LoadingPage>
 			<Router>
 				<Navbar />
 				<div className="main-page">
+				<NotificationContainer />
 				<Switch>
 					<Route path="/" component={userData.id ? MainPage : LoginPage} exact />
 					<Route path="/register" component={RegisterPage} exact />
+					<Route path="/profile" component={ProfilePage} exact />
+					<Route path="/change-password" component={ChangePasswordPage} exact />
 					<Route path="/resend-verification-email" component={ResendPage} exact />
 					<Route path="/confirm-email/:user_id/:token" component={ConfirmEmail} exact />
 					<Route path="*" component={NotFound} exact />

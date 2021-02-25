@@ -20,11 +20,10 @@ let Navbar = ({className}) => {
             <Logo to="/">Dice game</Logo>
             <NavbarLinks>
                 <NavbarLink to="/register">Register</NavbarLink>
-                <NavbarLink onClick={logout}>Logout</NavbarLink>
+                {userData.id && <NavbarLink onClick={logout}>Logout</NavbarLink>}
             </NavbarLinks>
         </div>
     );
-
 };
 
 Navbar = styled(Navbar)`

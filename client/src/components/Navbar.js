@@ -1,9 +1,7 @@
 import styled from 'styled-components';
 import {useContext} from 'react';
-import GlobalContext from '../../GlobalContext';
-import NavbarLinks from './NavbarLinks';
-import NavbarLink from './NavbarLink';
-import Logo from './Logo';
+import GlobalContext from '../GlobalContext';
+import {NavbarLinks, NavbarLink, Logo} from './navbars';
 
 let Navbar = ({className}) => {
 

@@ -2,7 +2,7 @@ import {useParams} from 'react-router-dom';
 import {useState, useEffect} from 'react';
 import Container from '../components/Container';
 import Header from '../components/Header';
-import FormLink from '../components/form/FormLink';
+import {FormLink} from '../components/form';
 import apiClient from '../apiclient';
 
 
@@ -10,11 +10,15 @@ const ConfirmEmail = () => {
     const [isConfirmed, setIsConfirmed] = useState(false);
     const {user_id, token} = useParams();
 
-    useEffect(() => {
-        apiClient.get(`/auth/confirm-email/${user_id}/${token}`)
+    const confirm = async () => {
+        await apiClient.post(`/auth/confirm-email/${user_id}/${token}`)
         .then(response => {
             setIsConfirmed(true);
         });
+    };
+
+    useEffect(() => {
+        confirm();
     }, []);
 
     return (

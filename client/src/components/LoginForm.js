@@ -1,12 +1,5 @@
 import {useState, useContext} from 'react';
-import Input from './form/Input';
-import SubmitButton from './SubmitButton';
-import Form from './form/Form';
-import FormHeader from './form/FormHeader';
-import FormField from './form/FormField';
-import FormText from './form/FormText';
-import FormError from './form/FormError';
-import FormLink from './form/FormLink';
+import {Form, FormHeader, FormField, FormError, FormText, Input, FormLink, SubmitButton} from './form';
 import GlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
 
@@ -17,9 +10,9 @@ const LoginForm = () => {
     const [error, setError] = useState(false);
     const {getUserData, NotificationManager} = useContext(GlobalContext);
 
-    const login = e => {
+    const login = async e => {
         e.preventDefault();
-        apiClient.post("/auth/login", {username, password})
+        await apiClient.post("/auth/login", {username, password})
         .then(response => {
             localStorage.setItem("dice-token", response.data.access_token);
             getUserData();

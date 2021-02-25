@@ -1,11 +1,5 @@
 import {useReducer, useContext, useState} from 'react';
-import Form from "./form/Form";
-import FormField from "./form/FormField";
-import FormHeader from "./form/FormHeader";
-import FormText from './form/FormText';
-import FormError from './form/FormError';
-import Input from './form/Input';
-import SubmitButton from "./SubmitButton";
+import {Form, FormHeader, FormField, FormError, FormText, Input, FormLink, SubmitButton} from './form';
 import GlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
 
@@ -39,10 +33,10 @@ const RegisterForm = () => {
 
     const {NotificationManager} = useContext(GlobalContext);
 
-    const register = e => {
+    const register = async e => {
         e.preventDefault();
-        NotificationManager.info("Loading...", null, 2000);
-        apiClient.post("/auth/register", formState)
+        NotificationManager.info("Sending...", null, 2000);
+        await apiClient.post("/auth/register", formState)
         .then(response => {
             setErrors({});
             NotificationManager.success(
@@ -87,6 +81,7 @@ const RegisterForm = () => {
                 <Input type="password" value={password2} required onChange={e => dispatch({type: 'password2', payload: e.target.value})}/>
                 {errors.password2 && <FormError>{errors.password2}</FormError>}
             </FormField>
+            <FormLink to="/resend-verification-email">Re-send activation e-mail</FormLink>
             {errors.detail && <FormError>{errors.detail}</FormError>}
             <SubmitButton type="submit" value="Register"/>
         </Form>

@@ -32,7 +32,7 @@ def resend(email_data: ResendEmailSchema, db: Session = Depends(get_db)):
     return {"detail": "Confirmation email sent"}
 
 
-@user_router.get("/confirm-email/{user_id}/{token}")
+@user_router.post("/confirm-email/{user_id}/{token}")
 def confirm_email(user_id: UUID, token: str, db: Session = Depends(get_db)):
     user_service.confirm_email(db=db, user_id=user_id, token=token)
     return {"detail": "Email confirmed successfully"}

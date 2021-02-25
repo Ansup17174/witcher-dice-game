@@ -1,12 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap');
+
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  font-family: 'Source Sans Pro', sans-serif !important;
 }
 
 body {
   background-color: rgb(30, 30, 30);
-  font-family: sans-serif;
 }
 
 input:-webkit-autofill {
@@ -14,7 +16,8 @@ input:-webkit-autofill {
   -webkit-text-fill-color: white;
 
 }
-#root {
+
+.main-page {
   display: flex;
   justify-content: center;
   height: 100vh;

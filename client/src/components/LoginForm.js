@@ -1,12 +1,12 @@
 import {useState, useContext} from 'react';
-import Input from './Input';
+import Input from './form/Input';
 import SubmitButton from './SubmitButton';
-import Form from './Form';
-import FormHeader from './FormHeader';
-import FormField from './FormField';
-import FormText from './FormText';
-import FormError from './FormError';
-import FormLink from './FormLink';
+import Form from './form/Form';
+import FormHeader from './form/FormHeader';
+import FormField from './form/FormField';
+import FormText from './form/FormText';
+import FormError from './form/FormError';
+import FormLink from './form/FormLink';
 import GlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
 

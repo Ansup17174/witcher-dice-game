@@ -1,10 +1,10 @@
 import {useReducer, useContext, useState} from 'react';
-import Form from "./Form";
-import FormField from "./FormField";
-import FormHeader from "./FormHeader";
-import FormText from './FormText';
-import FormError from './FormError';
-import Input from './Input';
+import Form from "./form/Form";
+import FormField from "./form/FormField";
+import FormHeader from "./form/FormHeader";
+import FormText from './form/FormText';
+import FormError from './form/FormError';
+import Input from './form/Input';
 import SubmitButton from "./SubmitButton";
 import GlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
@@ -41,6 +41,7 @@ const RegisterForm = () => {
 
     const register = e => {
         e.preventDefault();
+        NotificationManager.info("Loading...", null, 2000);
         apiClient.post("/auth/register", formState)
         .then(response => {
             setErrors({});

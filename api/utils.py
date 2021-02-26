@@ -36,6 +36,25 @@ def send_confirmation_mail(user: UserModel):
     smtp.send_message(mail)
 
 
+def send_new_password(user: UserModel, password: str):
+    params = {
+        "site": "dicegame.net",
+        "username": user.username,
+        "password": password
+    }
+    smtp = smtplib.SMTP(host=config.EMAIL_HOST, port=config.EMAIL_PORT)
+    smtp.starttls()
+    smtp.login(config.EMAIL_ADDRESS, config.EMAIL_PASSWORD)
+    mail = MIMEMultipart()
+    message_template = get_template("password_reset.txt")
+    message = message_template.substitute(**params)
+    mail['From'] = config.EMAIL_ADDRESS
+    mail['To'] = user.email.address
+    mail['Subject'] = "Dice game password reset"
+    mail.attach(MIMEText(message, "plain"))
+    smtp.send_message(mail)
+
+
 def times_in_array(n, array):  # Returns value that appears n-times in given array, works for cases below
     for val in array:
         if array.count(val) == n:

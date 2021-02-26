@@ -52,8 +52,12 @@ def change_password(
 
 
 @user_router.post("/reset-password")
-def reset_password(email: ResetPasswordSchema, db: Session = Depends(get_db)):
-    return "xd"
+def reset_password(data: ResetPasswordSchema, db: Session = Depends(get_db)):
+    email_model = user_service.get_email(db=db, address=data.email, is_confirmed=True)
+    if email_model is None:
+        raise HTTPException(detail="Email not found", status_code=404)
+    user_service.reset_password(db=db, email=email_model)
+    return {"detail": "New password sent"}
 
 
 @user_router.post("/login")

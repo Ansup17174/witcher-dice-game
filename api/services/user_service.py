@@ -7,13 +7,15 @@ from .. import config
 from ..models import UserModel, EmailModel, UserProfileModel
 from ..database import get_db
 from ..config import password_context
-from ..utils import send_confirmation_mail
+from ..utils import send_confirmation_mail, send_new_password
 from typing import Optional
 from datetime import timedelta, datetime
 from jose import jwt, JWTError
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from ..exceptions import auth_exception
+import string
+import random
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -141,3 +143,13 @@ def generate_access_token(
 ):
     to_encode = {**data, 'exp': datetime.utcnow() + expire_delta}
     return jwt.encode(to_encode, key=config.SECRET_KEY, algorithm=config.ALGORITHM)
+
+
+def reset_password(db: Session, email: EmailModel):
+    user_model = get_user(db=db, id=email.user_id)
+    password = ""
+    for i in range(20):
+        password += random.choice(string.ascii_letters + string.digits)
+    user_model.password = password_context.hash(password)
+    send_new_password(user=user_model, password=password)
+    db.commit()

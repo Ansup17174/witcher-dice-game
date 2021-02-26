@@ -12,13 +12,14 @@ const ResetPasswordForm = () => {
 
     const resetPassword = async e => {
         e.preventDefault();
+        NotificationManager.info("Sending...", null, 2000);
         await apiClient.post("/auth/reset-password", {email: email})
         .then(response => {
             setError({});
             NotificationManager.success("New password sent!", null, 2000);
         })
         .catch(error => {
-            setError(parseErrors(error, setError));
+            parseErrors(error, setError);
         });
     };
 

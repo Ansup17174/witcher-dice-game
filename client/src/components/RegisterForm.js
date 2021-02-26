@@ -36,10 +36,10 @@ const RegisterForm = () => {
 
     const register = async e => {
         e.preventDefault();
+        setErrors({});
         NotificationManager.info("Sending...", null, 2000);
         await apiClient.post("/auth/register", formState)
         .then(response => {
-            setErrors({});
             NotificationManager.success(
                 "Check your e-mail for confirmation",
                 "Registered!",

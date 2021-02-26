@@ -11,6 +11,7 @@ import GlobalContext from './GlobalContext';
 import apiClient from './apiclient';
 import ConfirmEmail from './pages/ConfirmEmail';
 import ResendPage from './pages/ResendPage';
+import RoomPage from './pages/RoomPage';
 import Navbar from './components/Navbar';
 import 'react-notifications/lib/notifications.css';
 import {NotificationManager, NotificationContainer} from 'react-notifications';
@@ -67,19 +68,20 @@ const App = () => {
 		getUserData();
 		await sleep(250);
 		setLoading(false);
-		return () => {
-			onlineUsersWs.current.close();
-		};
 	};
 
 	useEffect(() => {
 		onlineUsersWs.current = new WebSocket(webSocketBase + "/online");
 		onlineUsersWs.current.onmessage = message => setOnlineUsers(JSON.parse(message.data));
+		onlineUsersWs.current.onopen = () => onlineUsersWs.current.send(localStorage.getItem('dice-token'))
 		init();
+		return () => {
+			onlineUsersWs.current.close();
+		};
 	}, []);
 
 	return (
-		<GlobalContext.Provider value={{userData, setUserData, getUserData, NotificationManager, webSocketBase}}>
+		<GlobalContext.Provider value={{userData, setUserData, getUserData, NotificationManager, webSocketBase, onlineUsers}}>
 			<LoadingPage loading={loading}>Loading...</LoadingPage>
 			<Router>
 				<Navbar />
@@ -89,8 +91,9 @@ const App = () => {
 					<Route path="/" component={userData.id ? MainPage : LoginPage} exact />
 					<Route path="/register" component={RegisterPage} exact />
 					<Route path="/profile" component={ProfilePage} exact />
+					<Route path="/room/:roomId" component={RoomPage} exact />
 					<Route path="/change-password" component={ChangePasswordPage} exact />
-					<Route path="/reset-password" component={ResetPasswordPage} exact />a
+					<Route path="/reset-password" component={ResetPasswordPage} exact />
 					<Route path="/resend-verification-email" component={ResendPage} exact />
 					<Route path="/confirm-email/:user_id/:token" component={ConfirmEmail} exact />
 					<Route path="*" component={NotFound} exact />

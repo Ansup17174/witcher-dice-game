@@ -30,7 +30,7 @@ class OnlineUsersManager:
             await authorize(self.connection_list, ws, access_token)
             await self.send_to_all()
         except HTTPException:
-            await ws.send_text("Invalid token")
+            pass
 
     async def disconnect(self, ws: WebSocket):
         for connection in self.connection_list:
@@ -64,22 +64,35 @@ class PublicChatManager:
     async def send_chat_to_all(self):
         for connection in self.connection_list:
             try:
-                await connection[0].send_text("\n".join(self.chat_state))
+                await connection[0].send_json(self.chat_state)
             except ConnectionClosed:
                 pass
 
-    async def receive_message(self, message: str):
-        self.chat_state.append(message)
-        await self.send_chat_to_all()
+    async def receive_message(self, message: str, ws: WebSocket):
+        for connection in self.connection_list:
+            if connection[0] is ws and connection[1]:
+                self.chat_state.append(f"{connection[1]}: {message}")
+                await self.send_chat_to_all()
+                break
 
     async def send_chat_to_one(self, ws: WebSocket):
-        await ws.send_text("\n".join(self.chat_state))
+        await ws.send_json(self.chat_state)
 
     async def disconnect(self, ws: WebSocket):
         for connection in self.connection_list:
             if connection[0] is ws:
                 self.connection_list.remove(connection)
                 break
+
+    async def dispatch(self, data: dict, ws: WebSocket):
+        actions = ['message', 'authorize']
+        action = data.get('action')
+        if action not in actions:
+            return
+        if action == "authorize":
+            await self.authorize(ws=ws, access_token=data['access_token'])
+        elif action == "message" and data.get("text"):
+            await self.receive_message(message=data['text'], ws=ws)
 
 
 class RoomManager:
@@ -177,15 +190,17 @@ class RoomManager:
         return user
 
     async def dispatch(self, data: dict, ws: WebSocket):
+        actions = ['roll', 'pass', 'surrender', 'tie', 'ready', 'authorize']
+        action = data.get('action')
         if self.game_state.is_finished:
             return
+        if action == 'authorize' and data.get('access_token'):
+            await self.authorize(ws=ws, access_token=data['access_token'])
         user = await self.get_user(ws)
         if not user:
             await self.send_game_state()
             return
         player_index = self.game_state.players.index(user.username)
-        actions = ['roll', 'pass', 'surrender', 'tie', 'ready']
-        action = data.get('action')
         if action not in actions:
             await self.send_game_state()
             return

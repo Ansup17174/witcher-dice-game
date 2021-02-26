@@ -42,8 +42,8 @@ async def public_chat(ws: WebSocket):
     await public_chat_manager.send_chat_to_one(ws)
     try:
         while True:
-            message = await ws.receive_text()
-            await public_chat_manager.receive_message(message)
+            data = await ws.receive_json()
+            await public_chat_manager.dispatch(data=data, ws=ws)
     except WebSocketDisconnect:
         await public_chat_manager.disconnect(ws)
 
@@ -60,8 +60,8 @@ async def room_list(ws: WebSocket):
         await room_list_manager.disconnect(ws)
 
 
-@game_router.websocket("/ws/room/{room_id}/{access_token}")
-async def room_websocket(ws: WebSocket, room_id: str, access_token: str):
+@game_router.websocket("/ws/room/{room_id}")
+async def room_websocket(ws: WebSocket, room_id: str):
     await ws.accept()
     selected_room = None
     for room in room_list_manager.room_list:
@@ -70,8 +70,6 @@ async def room_websocket(ws: WebSocket, room_id: str, access_token: str):
             break
     if selected_room is None:
         raise WebSocketDisconnect
-    await selected_room.authorize(ws, access_token)
-    await selected_room.send_game_state()
     try:
         while True:
             data = await ws.receive_json()

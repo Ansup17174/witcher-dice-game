@@ -5,6 +5,16 @@ export const Container = styled.div`
     width: 70%;
     text-align: center;
     padding: 50px;
+    margin: 40px 0;
+`;
+
+export const ColumnContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    min-height: 90vh;
 `;
 
 export const Row = styled.div`
@@ -13,4 +23,10 @@ export const Row = styled.div`
     justify-content: space-between;
     align-items: center;
     font-size: 25px;
+    margin: 10px 0;
+`;
+
+export const GameContainer = styled.div`
+    margin: 50px 0;
+    width: 100%;
 `;

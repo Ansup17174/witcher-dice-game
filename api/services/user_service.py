@@ -57,6 +57,11 @@ def get_user(db: Session, **kwargs):
     return get_users(db, **kwargs).first()
 
 
+def get_active_user_by_username(db: Session, username: str):
+    conditions = [EmailModel.is_confirmed, UserModel.username == username]
+    return db.query(UserModel).join(EmailModel).filter(and_(*conditions)).first()
+
+
 def get_emails(db: Session, **kwargs):
     conditions = [getattr(EmailModel, key) == value for key, value in kwargs.items()]
     return db.query(EmailModel).filter(and_(*conditions))
@@ -76,7 +81,7 @@ def get_user_profile(db: Session, **kwargs):
 
 
 def resend_verification_email(db: Session, email: str):
-    email_model = get_email(address=email, is_confirmed=False)
+    email_model = get_email(db=db, address=email, is_confirmed=False)
     if email_model is None:
         raise HTTPException(detail="Email not found", status_code=404)
     user = get_user(db=db, id=email_model.user_id)

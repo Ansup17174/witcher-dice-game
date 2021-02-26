@@ -48,33 +48,38 @@ def register_user(db: Session, user_data: UserRegisterSchema):
     return user_model
 
 
-def get_user_by_id(db: Session, user_id: UUID):
-    return db.query(UserModel).filter(UserModel.id == user_id).first()
+def get_users(db: Session, **kwargs):
+    conditions = [getattr(UserModel, key) == value for key, value in kwargs.items()]
+    return db.query(UserModel).filter(and_(*conditions))
 
 
-def get_user_by_username(db: Session, username: str):
-    return db.query(UserModel).filter(UserModel.username == username).first()
+def get_user(db: Session, **kwargs):
+    return get_users(db, **kwargs).first()
 
 
-def get_active_user_by_username(db: Session, username: str):
-    conditions = [EmailModel.is_confirmed, UserModel.username == username]
-    return db.query(UserModel).join(EmailModel).filter(and_(*conditions)).first()
+def get_emails(db: Session, **kwargs):
+    conditions = [getattr(EmailModel, key) == value for key, value in kwargs.items()]
+    return db.query(EmailModel).filter(and_(*conditions))
 
 
-def get_email(db: Session, email: str):
-    return db.query(EmailModel).filter(EmailModel.address == email).first()
+def get_email(db: Session, **kwargs):
+    return get_emails(db, **kwargs).first()
 
 
-def get_user_profile(db: Session, user_id: UUID):
-    return db.query(UserProfileModel).filter(UserProfileModel.user_id == user_id).first()
+def get_user_profiles(db: Session, **kwargs):
+    conditions = [getattr(UserProfileModel, key) == value for key, value in kwargs.items()]
+    return db.query(UserProfileModel).filter(and_(*conditions))
+
+
+def get_user_profile(db: Session, **kwargs):
+    return get_user_profiles(db, **kwargs).first()
 
 
 def resend_verification_email(db: Session, email: str):
-    email_model = db.query(EmailModel)\
-        .filter(and_(EmailModel.address == email, EmailModel.is_confirmed == False)).first()
+    email_model = get_email(address=email, is_confirmed=False)
     if email_model is None:
         raise HTTPException(detail="Email not found", status_code=404)
-    user = get_user_by_id(db=db, user_id=email_model.user_id)
+    user = get_user(db=db, id=email_model.user_id)
     email_model.activation_token = str(uuid4())
     db.commit()
     send_confirmation_mail(user=user)
@@ -100,7 +105,7 @@ def change_password(db: Session, data: ChangePasswordSchema, user: UserModel):
 
 
 def login_user(username: str, password: str, db: Session):
-    user = get_user_by_username(username=username, db=db)
+    user = get_user(username=username, db=db)
     if not user:
         return None
     if not user.email.is_confirmed:

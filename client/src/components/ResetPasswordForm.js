@@ -2,6 +2,7 @@ import {useState, useContext} from 'react';
 import {Form, FormField, FormHeader, Input, FormText, FormError, SubmitButton} from './form';
 import apiClient from '../apiclient';
 import GlobalContext from '../GlobalContext';
+import parseErrors from '../errorParser';
 
 const ResetPasswordForm = () => {
 
@@ -17,7 +18,7 @@ const ResetPasswordForm = () => {
             NotificationManager.success("New password sent!", null, 2000);
         })
         .catch(error => {
-            setError(error.response.data);
+            setError(parseErrors(error, setError));
         });
     };
 

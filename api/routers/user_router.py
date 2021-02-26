@@ -4,7 +4,7 @@ from ..services import user_service
 from ..models import UserModel
 from ..schemas.users import (UserRegisterSchema, UserLoginSchema,
                              ResendEmailSchema, UserSchema, TokenSchema,
-                             ChangePasswordSchema)
+                             ChangePasswordSchema, ResetPasswordSchema)
 from ..exceptions import auth_exception, get_unique_violation_exception
 from ..config import password_context
 from sqlalchemy.orm import Session
@@ -49,6 +49,11 @@ def change_password(
         raise HTTPException(detail="Incorrect password", status_code=400)
     user_service.change_password(db=db, data=data, user=user)
     return {"detail": "Password changed!"}
+
+
+@user_router.post("/reset-password")
+def reset_password(email: ResetPasswordSchema, db: Session = Depends(get_db)):
+    return "xd"
 
 
 @user_router.post("/login")

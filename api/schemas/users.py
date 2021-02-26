@@ -1,7 +1,6 @@
 from pydantic import BaseModel, validator
 from uuid import UUID
 import re
-import string
 
 
 class EmailSchema(BaseModel):
@@ -91,6 +90,10 @@ class ChangePasswordSchema(BaseModel):
         if 'new_password1' in values and values['new_password1'] != new_password2:
             raise ValueError("Password are not same")
         return new_password2
+
+
+class ResetPasswordSchema(BaseModel):
+    email: str
 
 
 class TokenSchema(BaseModel):

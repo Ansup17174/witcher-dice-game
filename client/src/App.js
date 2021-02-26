@@ -4,6 +4,7 @@ import MainPage from './pages/MainPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import NotFound from './pages/NotFound';
 import ProfilePage from './pages/ProfilePage';
 import GlobalContext from './GlobalContext';
@@ -14,6 +15,7 @@ import Navbar from './components/Navbar';
 import 'react-notifications/lib/notifications.css';
 import {NotificationManager, NotificationContainer} from 'react-notifications';
 import LoadingPage from './pages/LoadingPage';
+
 
 const App = () => {
 
@@ -88,6 +90,7 @@ const App = () => {
 					<Route path="/register" component={RegisterPage} exact />
 					<Route path="/profile" component={ProfilePage} exact />
 					<Route path="/change-password" component={ChangePasswordPage} exact />
+					<Route path="/reset-password" component={ResetPasswordPage} exact />a
 					<Route path="/resend-verification-email" component={ResendPage} exact />
 					<Route path="/confirm-email/:user_id/:token" component={ConfirmEmail} exact />
 					<Route path="*" component={NotFound} exact />

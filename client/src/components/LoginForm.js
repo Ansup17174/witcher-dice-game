@@ -35,7 +35,7 @@ const LoginForm = () => {
                     <FormText>Password</FormText>
                     <Input type="password" required value={password} onChange={e => setPassword(e.target.value)}/>
                 </FormField>
-                <FormLink to="/register">Dont have an account?</FormLink>
+                <FormLink to="/reset-password">Forgot password?</FormLink>
                 {error && <FormError>Unable to login with given credentials</FormError>}
             <SubmitButton type="submit" value="Login"/>
         </Form>

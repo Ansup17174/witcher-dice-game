@@ -28,7 +28,7 @@ const ResendForm = () => {
             <FormHeader>Re-send verification e-mail</FormHeader>
             <FormField>
                 <FormText>E-mail</FormText>
-                <Input type="email" value={email} onChange={e => setEmail(e.target.value)}/>
+                <Input type="email" required value={email} onChange={e => setEmail(e.target.value)}/>
                 <FormError>{error}</FormError>
             </FormField>
             <SubmitButton type="submit" value="Re-send" />

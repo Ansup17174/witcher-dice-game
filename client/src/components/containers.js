@@ -6,3 +6,11 @@ export const Container = styled.div`
     text-align: center;
     padding: 50px;
 `;
+
+export const Row = styled.div`
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 25px;
+`;

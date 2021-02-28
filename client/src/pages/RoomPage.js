@@ -1,4 +1,4 @@
-import {useState, useEffect, useContext, useRef} from 'react';
+import {useState, useEffect, useReducer, useContext, useRef} from 'react';
 import GlobalContext from '../GlobalContext';
 import {GameContainer, GameButtons, GameDices, GameSpace, DiceImage, GameText} from '../components/game';
 import {useParams} from 'react-router-dom';
@@ -26,13 +26,35 @@ const RoomPage = () => {
         is_finished: false,
         ready: [false, false]
     });
-    const [selectedDices, setSelectedDices] = useState({
+
+    const reducer = (state, action) => {
+        if (!gameState.ready[0] || !gameState.ready[1]) {
+            return state;
+        }
+        switch (action.type) {
+            case 0:
+                return {...state, 0: !state[0]};
+            case 1:
+                return {...state, 1: !state[1]};
+            case 2:
+                return {...state, 2: !state[2]};
+            case 3:
+                return {...state, 3: !state[3]};
+            case 4:
+                return {...state, 4: !state[4]};
+            default:
+                return state;
+        }
+    };
+
+    const [selectedDices, dispatch] = useReducer(reducer, {
         0: false,
         1: false,
         2: false,
         3: false,
         4: false
-    })
+    });
+
     const {NotificationManager, webSocketBase} = useContext(GlobalContext);
     const roomWs = useRef(null);
 
@@ -69,15 +91,15 @@ const RoomPage = () => {
             <GameContainer>
                 <GameDices>
                     <DiceImage src={`/images/dice${gameState.dices[0][0]}.png`} alt={`dice${gameState.dices[0][0]}`}
-                    selected={selectedDices[0]} onClick={() => setSelectedDices({...selectedDices, 0: !selectedDices[0]})}/>
+                    selected={selectedDices[0]} onClick={() => dispatch({type: 0})}/>
                     <DiceImage src={`/images/dice${gameState.dices[0][1]}.png`} alt={`dice${gameState.dices[0][1]}`}
-                    selected={selectedDices[1]} onClick={() => setSelectedDices({...selectedDices, 1: !selectedDices[1]})}/>
+                    selected={selectedDices[1]} onClick={() => dispatch({type: 1})}/>
                     <DiceImage src={`/images/dice${gameState.dices[0][2]}.png`} alt={`dice${gameState.dices[0][2]}`}
-                    selected={selectedDices[2]} onClick={() => setSelectedDices({...selectedDices, 2: !selectedDices[2]})}/>
+                    selected={selectedDices[2]} onClick={() => dispatch({type: 2})}/>
                     <DiceImage src={`/images/dice${gameState.dices[0][3]}.png`} alt={`dice${gameState.dices[0][3]}`}
-                    selected={selectedDices[3]} onClick={() => setSelectedDices({...selectedDices, 3: !selectedDices[3]})}/>
+                    selected={selectedDices[3]} onClick={() => dispatch({type: 3})}/>
                     <DiceImage src={`/images/dice${gameState.dices[0][4]}.png`} alt={`dice${gameState.dices[0][4]}`}
-                    selected={selectedDices[4]} onClick={() => setSelectedDices({...selectedDices, 4: !selectedDices[4]})}/>
+                    selected={selectedDices[4]} onClick={() => dispatch({type: 4})}/>
                 </GameDices>
                 <GameText>You</GameText>
                 <GameText>Pattern: {patterns[gameState.dices_value[1]]}</GameText>

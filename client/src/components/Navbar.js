@@ -27,7 +27,7 @@ let Navbar = ({className}) => {
 };
 
 Navbar = styled(Navbar)`
-    height: 10vh;
+    height: 70px;
     color: black;
     background-color: rgb(40, 40, 40);
     display: flex;

@@ -16,6 +16,7 @@ const MainPage = () => {
     const [chatInput, setChatInput] = useState("");
     const [roomList, setRoomList] = useState([]);
     const {webSocketBase, NotificationManager, onlineUsers} = useContext(GlobalContext);
+    const chatDiv = useRef(null);
 
     useEffect(() => {
         chatWs.current = new WebSocket(webSocketBase + "/chat");
@@ -28,7 +29,10 @@ const MainPage = () => {
             }));
         };
         
-        chatWs.current.onmessage = message => setChatState(JSON.parse(message.data));
+        chatWs.current.onmessage = message => {
+            setChatState(JSON.parse(message.data));
+            chatDiv.current.scrollTop = chatDiv.current.scrollHeight;
+        };
         chatWs.current.onopen = () => authorize();
         chatWs.current.onerror = error => NotificationManager.error("Error while sending message", null, 2000);
 
@@ -74,7 +78,7 @@ const MainPage = () => {
             </Container>
             <Container>
                 <Header>Chat</Header>
-                <ChatArea>
+                <ChatArea ref={chatDiv}>
                     {chatState.map((line, index) => <div key={index}>{line}</div>)}
                 </ChatArea>
                 <Row>

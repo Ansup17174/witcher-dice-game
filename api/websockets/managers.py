@@ -103,8 +103,8 @@ class RoomManager:
             "players": [],
             "score": [0, 0],
             "dices": [
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0]
+                [6, 6, 6, 6, 6],
+                [6, 6, 6, 6, 6]
             ],
             "dices_value": [0, 0],
             "current_player": 0,

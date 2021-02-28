@@ -27,6 +27,8 @@ const RoomPage = () => {
         ready: [false, false]
     });
 
+
+
     const reducer = (state, action) => {
         if (!gameState.ready[0] || !gameState.ready[1]) {
             return state;
@@ -55,8 +57,31 @@ const RoomPage = () => {
         4: false
     });
 
-    const {NotificationManager, webSocketBase} = useContext(GlobalContext);
+    const {userData, NotificationManager, webSocketBase} = useContext(GlobalContext);
     const roomWs = useRef(null);
+
+    const sendReady = async () => {
+        const data = {
+            action: 'ready'
+        };
+        roomWs.current.send(JSON.stringify(data));
+    };
+
+    const sendPass = async () => {
+        const data = {
+            action: 'pass'
+        };
+        roomWs.current.send(JSON.stringify(data));
+    };
+
+    const sendDices = async () => {
+        const dices = Object.entries(selectedDices).filter(([key, value]) => value).map(([key, value]) => key);
+        const data = {
+            action: 'roll',
+            dices: dices
+        };
+        roomWs.current.send(JSON.stringify(data));
+    };
 
     useEffect(() => {
         roomWs.current = new WebSocket(webSocketBase + `/room/${roomId}`);
@@ -74,10 +99,13 @@ const RoomPage = () => {
                 <GameText>Score: {`${gameState.score[0]}-${gameState.score[1]}`}</GameText>
                 <Header>
                     {gameState.players.length === 2 ? 
-                    (gameState.current_player === 0 ? "Your turn" : "Opponent's turn") : "Waiting for an opponent"}
+                    (gameState.ready[0] && gameState.ready[1] ? 
+                    (gameState.players[gameState.current_player] === userData.username ? "Your turn" : "Opponent's turn") : null)
+                     : "Waiting for an opponent"}
                 </Header>
             <GameContainer>
-                <GameText>Player2</GameText>
+                {gameState.players.length === 2 && <GameText>{gameState.players[0] === userData.username ? 
+                gameState.players[1] : gameState.players[0]}</GameText>}
                 <GameText>Pattern: {patterns[gameState.dices_value[0]]}</GameText>
                 <GameDices>
                     <DiceImage src={`/images/dice${gameState.dices[1][0]}.png`} alt={`dice${gameState.dices[1][0]}`}/>
@@ -105,13 +133,20 @@ const RoomPage = () => {
                 <GameText>Pattern: {patterns[gameState.dices_value[1]]}</GameText>
             </GameContainer>
             <GameButtons>
-                <SmallButton type="submit" value="Ready" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)"/>
-                {gameState.ready[0] && <SmallButton type="submit" value="Pass" color="rgb(214, 166, 21)" hoverColor="rgb(255, 199, 28)"/>}
-                {gameState.ready[0] && <SmallButton type="submit" value="Roll" color="green" hoverColor="rgb(75, 245, 66)"/>}
+                {!gameState.ready[gameState.players.indexOf(userData.username)] && 
+                <SmallButton type="submit" value="Ready" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)"
+                onClick={() => sendReady()}/>}
+                {gameState.ready[0]
+                && gameState.ready[1]
+                && <SmallButton type="submit" value="Pass" color="rgb(214, 166, 21)" hoverColor="rgb(255, 199, 28)"
+                onClick={() => sendPass()}/>}
+                {gameState.ready[0]
+                && gameState.ready[1]
+                && <SmallButton type="submit" value="Roll" color="green" hoverColor="rgb(75, 245, 66)"
+                onClick={() => sendDices()}/>}
             </GameButtons>
         </Container>
     );
 };
 
 export default RoomPage;
-

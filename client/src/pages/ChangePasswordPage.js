@@ -1,6 +1,7 @@
 import {useState, useContext} from 'react';
 import {useHistory} from 'react-router-dom';
-import {Form, FormError, FormField, FormHeader, FormText, Input, SubmitButton} from '../components/form';
+import {Form, FormError, FormField, FormHeader, FormText, Input} from '../components/form';
+import Button from '../components/Button';
 import GlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
 import parseErrors from '../errorParser';
@@ -58,7 +59,7 @@ const ChangePasswordPage = () => {
                 <Input type="password" value={newPassword2} onChange={e => setNewPassword2(e.target.value)}/>
                 {errors.new_password2 && <FormError>{errors.new_password2}</FormError>}
             </FormField>
-            <SubmitButton type="submit" value="Change password"/>
+            <Button type="submit" value="Change password" color="green" hoverColor="rgb(75, 245, 66)"/>
         </Form>
     );
 };

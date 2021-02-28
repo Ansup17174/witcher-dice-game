@@ -1,5 +1,6 @@
-import {Form, FormField, FormHeader, Input, SubmitButton, FormError, FormText} from './form';
+import {Form, FormField, FormHeader, Input, FormError, FormText} from './form';
 import {useState, useContext} from 'react';
+import Button from '../components/Button';
 import GlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
 
@@ -31,7 +32,7 @@ const ResendForm = () => {
                 <Input type="email" required value={email} onChange={e => setEmail(e.target.value)}/>
                 <FormError>{error}</FormError>
             </FormField>
-            <SubmitButton type="submit" value="Re-send" />
+            <Button type="submit" value="Re-send" color="green" hoverColor="rgb(75, 245, 66)"/>
         </Form>
     );
 };

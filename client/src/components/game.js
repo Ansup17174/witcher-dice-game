@@ -37,3 +37,47 @@ export const ChatSubmit = styled.div`
         background-color: rgb(75, 245, 66);
     }
 `;
+
+export const GameButtons = styled.div`
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 25px;
+    margin: 10px 0;
+`;
+
+export const GameDices = styled.div`
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 50px 0;
+`;
+
+export const GameSpace = styled.div`
+    height: 25px;
+`;
+
+export const GameContainer = styled.div`
+    margin: 20px 0;
+    width: 100%;
+`;
+
+export const GameText = styled.h3`
+    color: white;
+`;
+
+export const DiceImage = styled.img`
+    padding: 10px;
+    width: 68px;
+    height: 68px;
+    transition: linear 0.1s;
+    cursor: pointer;
+    border-radius: 10%;
+    ${props => props.selected ? "background-color: rgb(240, 240, 240) !important;" : null}
+
+    &:hover {
+        background-color: rgb(180, 180, 180);
+    }
+`;

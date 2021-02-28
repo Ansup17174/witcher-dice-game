@@ -1,8 +1,8 @@
 import {useState, useEffect, useContext, useRef} from 'react';
 import GlobalContext from '../GlobalContext';
-import BlueButton from '../components/BlueButton';
+import Button from '../components/Button';
+import SmallButton from '../components/SmallButton';
 import WhiteLink from '../components/WhiteLink';
-import {SubmitButton} from '../components/form';
 import {Container, ColumnContainer, Row} from '../components/containers';
 import Header from '../components/Header';
 import {ChatArea, ChatInput, ChatSubmit} from '../components/game';
@@ -89,9 +89,9 @@ const MainPage = () => {
             </Container>
             <Container>
                 <Header>Room list</Header>
-                <SubmitButton type="submit" value="Create room " onClick={() => createRoom()}/>
+                <Button type="submit" value="Create room " onClick={() => createRoom()} color="green" hoverColor="rgb(75, 245, 66)"/>
                 {roomList.map((roomId, index) => (
-                <Row key={index}><span>Room #{roomId}</span><WhiteLink to={`/room/${roomId}`}><BlueButton>Join</BlueButton></WhiteLink></Row>
+                <Row key={index}><span>Room #{roomId}</span><WhiteLink to={`/room/${roomId}`}><SmallButton type="submit" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)" value="Join" /></WhiteLink></Row>
                 ))}
             </Container>
         </ColumnContainer>

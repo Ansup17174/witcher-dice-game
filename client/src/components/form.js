@@ -52,19 +52,3 @@ export const Input = styled.input`
     color: white;
     margin: 5px 0px;
 `;
-
-export const SubmitButton = styled.input`
-    color: white;
-    background-color: green;
-    padding: 20px 60px;
-    margin: 10px 0;
-    font-size: 20px;
-    outline: none;
-    border: none;
-    cursor: pointer;
-    transition: linear 0.4s;
-
-    &:hover {
-        background-color: rgb(75, 245, 66);
-    }
-`;

@@ -1,5 +1,6 @@
 import {useState, useContext} from 'react';
-import {Form, FormField, FormHeader, Input, FormText, FormError, SubmitButton} from './form';
+import {Form, FormField, FormHeader, Input, FormText, FormError} from './form';
+import Button from '../components/Button';
 import apiClient from '../apiclient';
 import GlobalContext from '../GlobalContext';
 import parseErrors from '../errorParser';
@@ -31,7 +32,7 @@ const ResetPasswordForm = () => {
                 <Input type="email" required value={email} onChange={e => setEmail(e.target.value)}/>
                 {error.detail && <FormError>{error.detail}</FormError>}
             </FormField>
-            <SubmitButton type="submit" value="Reset"/>
+            <Button type="submit" value="Reset" color="green" hoverColor="rgb(75, 245, 66)"/>
         </Form>
     );
 };

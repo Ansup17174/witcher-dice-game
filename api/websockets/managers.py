@@ -117,10 +117,10 @@ class RoomManager:
     async def authorize(self, ws: WebSocket, access_token: str):
         try:
             user = user_service.authenticate_user(token=access_token, db=SessionLocal())
-            if len(self.game_state.players) < 2:
-                self.game_state.players.append(user.username)
+            if user.username in self.game_state.players:
                 self.connection_list.append([ws, user])
-            elif user.username in self.game_state.players:
+            elif len(self.game_state.players) < 2:
+                self.game_state.players.append(user.username)
                 self.connection_list.append([ws, user])
             else:
                 await ws.close()

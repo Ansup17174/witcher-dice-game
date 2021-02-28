@@ -1,19 +1,19 @@
 import styled from 'styled-components';
 
-const SubmitButton = styled.input`
+const Button = styled.input`
     color: white;
-    background-color: green;
+    background-color: ${props => props.color};
     padding: 20px 60px;
     margin: 10px 0;
     font-size: 20px;
     outline: none;
     border: none;
     cursor: pointer;
-    transition: linear 0.4s;
+    transition: linear 0.25s;
 
     &:hover {
-        background-color: rgb(75, 245, 66);
+        background-color: ${props => props.hoverColor};
     }
 `;
 
-export default SubmitButton;
+export default Button;

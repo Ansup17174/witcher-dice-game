@@ -25,8 +25,3 @@ export const Row = styled.div`
     font-size: 25px;
     margin: 10px 0;
 `;
-
-export const GameContainer = styled.div`
-    margin: 50px 0;
-    width: 100%;
-`;

@@ -1,6 +1,7 @@
 import {useReducer, useContext, useState} from 'react';
-import {Form, FormHeader, FormField, FormError, FormText, Input, FormLink, SubmitButton} from './form';
+import {Form, FormHeader, FormField, FormError, FormText, Input, FormLink} from './form';
 import GlobalContext from '../GlobalContext';
+import Button from '../components/Button';
 import apiClient from '../apiclient';
 import parseErrors from '../errorParser';
 
@@ -76,7 +77,7 @@ const RegisterForm = () => {
             </FormField>
             <FormLink to="/resend-verification-email">Re-send activation e-mail</FormLink>
             {errors.detail && <FormError>{errors.detail}</FormError>}
-            <SubmitButton type="submit" value="Register"/>
+            <Button type="submit" value="Register" color="green" hoverColor="rgb(75, 245, 66)" />
         </Form>
     );
 };

@@ -1,5 +1,6 @@
 import {useState, useContext} from 'react';
-import {Form, FormHeader, FormField, FormError, FormText, Input, FormLink, SubmitButton} from './form';
+import {Form, FormHeader, FormField, FormError, FormText, Input, FormLink} from './form';
+import Button from './Button';
 import GlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
 
@@ -37,7 +38,7 @@ const LoginForm = () => {
                 </FormField>
                 <FormLink to="/reset-password">Forgot password?</FormLink>
                 {error && <FormError>Unable to login with given credentials</FormError>}
-            <SubmitButton type="submit" value="Login"/>
+            <Button type="submit" value="Login" color="green" hoverColor="rgb(75, 245, 66)"/>
         </Form>
     );
 };

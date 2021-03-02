@@ -98,6 +98,7 @@ class PublicChatManager:
 class RoomManager:
     def __init__(self, room_id: str):
         self.room_id: str = room_id
+        self.spectator_list: list[WebSocket] = []
         self.connection_list: list[list[WebSocket, UserModel]] = []
         self.game_state: GameStateSchema = GameStateSchema(**{
             "players": [],
@@ -124,9 +125,12 @@ class RoomManager:
                 self.game_state.players.append(user.username)
                 self.connection_list.append([ws, user])
             else:
-                await ws.close()
+                self.spectator_list.append(ws)
         except HTTPException:
             await ws.send_text("Invalid token")
+            self.spectator_list.append(ws)
+        finally:
+            await self.send_game_state()
 
     async def disconnect(self, ws: WebSocket):
         for connection in self.connection_list:
@@ -137,6 +141,11 @@ class RoomManager:
         for connection in self.connection_list:
             try:
                 await connection[0].send_json(self.game_state.dict())
+            except ConnectionClosed:
+                pass
+        for spectator in self.spectator_list:
+            try:
+                await spectator.send_json(self.game_state.dict())
             except ConnectionClosed:
                 pass
 
@@ -165,7 +174,6 @@ class RoomManager:
         await self.send_game_state()
         winner_index = 0 if self.game_state.score[0] > self.game_state.score[1] else 1
         loser_index = 0 if winner_index == 1 else 1
-        print(winner_index)
         winner_username = self.game_state.players[winner_index]
         loser_username = self.game_state.players[loser_index]
         self.game_state.winner = winner_username
@@ -184,6 +192,9 @@ class RoomManager:
         db.commit()
         for connection in self.connection_list:
             await connection[0].close()
+        for spectator in self.spectator_list:
+            await spectator.close()
+        RoomListManager.room_list.remove(self)
 
     async def get_user(self, ws: WebSocket):
         user = None
@@ -200,6 +211,7 @@ class RoomManager:
             return
         if action == 'authorize' and data.get('access_token'):
             await self.authorize(ws=ws, access_token=data['access_token'])
+            return
         user = await self.get_user(ws)
         if not user:
             await self.send_game_state()
@@ -208,11 +220,12 @@ class RoomManager:
         if action not in actions:
             await self.send_game_state()
             return
-        if action == 'ready' and self.game_state.ready != [True, True]:
-            self.game_state.ready[player_index] = True
-            if self.game_state.ready == [True, True]:
-                await self.initialize_game()
-            await self.send_game_state()
+        if action == 'ready':
+            if self.game_state.ready != [True, True]:
+                self.game_state.ready[player_index] = True
+                if self.game_state.ready == [True, True]:
+                    await self.initialize_game()
+                await self.send_game_state()
             return
         if player_index != self.game_state.current_player:
             await self.send_game_state()
@@ -252,9 +265,11 @@ class RoomManager:
 
 
 class RoomListManager:
+
+    room_list: list[RoomManager] = []
+
     def __init__(self):
         self.connection_list: list[WebSocket] = []
-        self.room_list: list[RoomManager] = []
 
     async def send_to_all(self):
         room_ids = [room.room_id for room in self.room_list]

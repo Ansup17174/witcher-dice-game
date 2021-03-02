@@ -1,7 +1,7 @@
 import {useState, useEffect, useReducer, useContext, useRef} from 'react';
 import GlobalContext from '../GlobalContext';
 import {GameContainer, GameButtons, GameDices, GameSpace, DiceImage, GameText} from '../components/game';
-import {useParams} from 'react-router-dom';
+import {useParams, useHistory} from 'react-router-dom';
 import {Container} from '../components/containers';
 import SmallButton from '../components/SmallButton';
 import Header from '../components/Header';
@@ -11,6 +11,7 @@ const RoomPage = () => {
     const patterns = [
         "Nothing", "Para", "Dwie pary", "Trojka", "Maly St", "Duzy St", "Full", "Kareta", "Poker"
     ];
+    const history = useHistory();
     const {roomId} = useParams();
     const [gameState, setGameState] = useState({
         players: [],
@@ -85,6 +86,7 @@ const RoomPage = () => {
 
     const sendDices = async () => {
         const dices = Object.entries(selectedDices).filter(([key, value]) => value).map(([key, value]) => Number.parseInt(key));
+        if (!dices.length) return
         const data = {
             action: 'roll',
             dices: dices
@@ -100,7 +102,8 @@ const RoomPage = () => {
             access_token: localStorage.getItem("dice-token")
         }));
         roomWs.current.onmessage = message => setGameState(JSON.parse(message.data));
-        roomWs.current.onclose = e => NotificationManager.info("Connection closed", null, 2000);
+        roomWs.current.onerror = e => history.push("/");
+        roomWs.current.onclose = e => NotificationManager.info("Game finished", null, 2000);
     }, []);
 
     return (

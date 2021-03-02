@@ -62,7 +62,6 @@ async def room_list(ws: WebSocket):
 
 @game_router.websocket("/ws/room/{room_id}")
 async def room_websocket(ws: WebSocket, room_id: str):
-    await ws.accept()
     selected_room = None
     for room in room_list_manager.room_list:
         if room.room_id == room_id and not room.game_state.is_finished:
@@ -70,6 +69,7 @@ async def room_websocket(ws: WebSocket, room_id: str):
             break
     if selected_room is None:
         raise WebSocketDisconnect
+    await ws.accept()
     try:
         while True:
             data = await ws.receive_json()

@@ -20,6 +20,6 @@ input:-webkit-autofill {
 .main-page {
   display: flex;
   justify-content: center;
-  min-height: 90vh;
+  min-height: calc(100vh - 70px);
   align-items: center;
 }

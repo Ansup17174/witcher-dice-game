@@ -24,13 +24,17 @@ const RoomPage = () => {
         turn: 1,
         deal: 1,
         is_finished: false,
-        ready: [false, false]
+        ready: [false, false],
+        winner: null
     });
 
-
+    const {userData, NotificationManager, webSocketBase} = useContext(GlobalContext);
+    const yourIndex = gameState.players.indexOf(userData.username) > -1 ? gameState.players.indexOf(userData.username) : 0;
+    const opponentIndex = yourIndex ? 0 : 1;
+    const roomWs = useRef(null);
 
     const reducer = (state, action) => {
-        if (!gameState.ready[0] || !gameState.ready[1]) {
+        if (!gameState.ready[0] || !gameState.ready[1] || gameState.current_player !== yourIndex) {
             return state;
         }
         switch (action.type) {
@@ -44,6 +48,14 @@ const RoomPage = () => {
                 return {...state, 3: !state[3]};
             case 4:
                 return {...state, 4: !state[4]};
+            case "reset":
+                return {
+                0: false,
+                1: false,
+                2: false,
+                3: false,
+                4: false
+            };
             default:
                 return state;
         }
@@ -56,9 +68,6 @@ const RoomPage = () => {
         3: false,
         4: false
     });
-
-    const {userData, NotificationManager, webSocketBase} = useContext(GlobalContext);
-    const roomWs = useRef(null);
 
     const sendReady = async () => {
         const data = {
@@ -75,12 +84,13 @@ const RoomPage = () => {
     };
 
     const sendDices = async () => {
-        const dices = Object.entries(selectedDices).filter(([key, value]) => value).map(([key, value]) => key);
+        const dices = Object.entries(selectedDices).filter(([key, value]) => value).map(([key, value]) => Number.parseInt(key));
         const data = {
             action: 'roll',
             dices: dices
         };
         roomWs.current.send(JSON.stringify(data));
+        dispatch({type: "reset"});
     };
 
     useEffect(() => {
@@ -106,44 +116,51 @@ const RoomPage = () => {
             <GameContainer>
                 {gameState.players.length === 2 && <GameText>{gameState.players[0] === userData.username ? 
                 gameState.players[1] : gameState.players[0]}</GameText>}
-                <GameText>Pattern: {patterns[gameState.dices_value[0]]}</GameText>
+                <GameText>Pattern: {patterns[gameState.dices_value[opponentIndex]]}</GameText>
                 <GameDices>
-                    <DiceImage src={`/images/dice${gameState.dices[1][0]}.png`} alt={`dice${gameState.dices[1][0]}`}/>
-                    <DiceImage src={`/images/dice${gameState.dices[1][1]}.png`} alt={`dice${gameState.dices[1][1]}`}/>
-                    <DiceImage src={`/images/dice${gameState.dices[1][2]}.png`} alt={`dice${gameState.dices[1][2]}`}/>
-                    <DiceImage src={`/images/dice${gameState.dices[1][3]}.png`} alt={`dice${gameState.dices[1][3]}`}/>
-                    <DiceImage src={`/images/dice${gameState.dices[1][4]}.png`} alt={`dice${gameState.dices[1][4]}`}/>
+                    <DiceImage src={`/images/dice${gameState.dices[opponentIndex][0]}.png`} alt={`dice${gameState.dices[opponentIndex][0]}`}/>
+                    <DiceImage src={`/images/dice${gameState.dices[opponentIndex][1]}.png`} alt={`dice${gameState.dices[opponentIndex][1]}`}/>
+                    <DiceImage src={`/images/dice${gameState.dices[opponentIndex][2]}.png`} alt={`dice${gameState.dices[opponentIndex][2]}`}/>
+                    <DiceImage src={`/images/dice${gameState.dices[opponentIndex][3]}.png`} alt={`dice${gameState.dices[opponentIndex][3]}`}/>
+                    <DiceImage src={`/images/dice${gameState.dices[opponentIndex][4]}.png`} alt={`dice${gameState.dices[opponentIndex][4]}`}/>
                 </GameDices>
             </GameContainer>
-            <GameSpace />
+            <GameSpace>
+                {!gameState.is_finished && gameState.deal_result !== "" && 
+                <Header>{gameState.players[gameState.deal_result]} gets the point</Header>}
+                {gameState.winner && <GameText>{gameState.winner} wins</GameText>}
+            </GameSpace>
             <GameContainer>
                 <GameDices>
-                    <DiceImage src={`/images/dice${gameState.dices[0][0]}.png`} alt={`dice${gameState.dices[0][0]}`}
+                    <DiceImage src={`/images/dice${gameState.dices[yourIndex][0]}.png`} alt={`dice${gameState.dices[0][0]}`}
                     selected={selectedDices[0]} onClick={() => dispatch({type: 0})}/>
-                    <DiceImage src={`/images/dice${gameState.dices[0][1]}.png`} alt={`dice${gameState.dices[0][1]}`}
+                    <DiceImage src={`/images/dice${gameState.dices[yourIndex][1]}.png`} alt={`dice${gameState.dices[0][1]}`}
                     selected={selectedDices[1]} onClick={() => dispatch({type: 1})}/>
-                    <DiceImage src={`/images/dice${gameState.dices[0][2]}.png`} alt={`dice${gameState.dices[0][2]}`}
+                    <DiceImage src={`/images/dice${gameState.dices[yourIndex][2]}.png`} alt={`dice${gameState.dices[0][2]}`}
                     selected={selectedDices[2]} onClick={() => dispatch({type: 2})}/>
-                    <DiceImage src={`/images/dice${gameState.dices[0][3]}.png`} alt={`dice${gameState.dices[0][3]}`}
+                    <DiceImage src={`/images/dice${gameState.dices[yourIndex][3]}.png`} alt={`dice${gameState.dices[0][3]}`}
                     selected={selectedDices[3]} onClick={() => dispatch({type: 3})}/>
-                    <DiceImage src={`/images/dice${gameState.dices[0][4]}.png`} alt={`dice${gameState.dices[0][4]}`}
+                    <DiceImage src={`/images/dice${gameState.dices[yourIndex][4]}.png`} alt={`dice${gameState.dices[0][4]}`}
                     selected={selectedDices[4]} onClick={() => dispatch({type: 4})}/>
                 </GameDices>
                 <GameText>You</GameText>
-                <GameText>Pattern: {patterns[gameState.dices_value[1]]}</GameText>
+                <GameText>Pattern: {patterns[gameState.dices_value[yourIndex]]}</GameText>
             </GameContainer>
             <GameButtons>
-                {!gameState.ready[gameState.players.indexOf(userData.username)] && 
+                {!gameState.ready[yourIndex] && gameState.score[0] !== 2 && gameState.score[1] !== 2 &&
                 <SmallButton type="submit" value="Ready" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)"
                 onClick={() => sendReady()}/>}
                 {gameState.ready[0]
                 && gameState.ready[1]
+                && gameState.current_player === yourIndex
                 && <SmallButton type="submit" value="Pass" color="rgb(214, 166, 21)" hoverColor="rgb(255, 199, 28)"
                 onClick={() => sendPass()}/>}
                 {gameState.ready[0]
                 && gameState.ready[1]
+                && gameState.current_player === yourIndex
                 && <SmallButton type="submit" value="Roll" color="green" hoverColor="rgb(75, 245, 66)"
                 onClick={() => sendDices()}/>}
+                {gameState.is_finished && <GameText>Game finished</GameText>}
             </GameButtons>
         </Container>
     );

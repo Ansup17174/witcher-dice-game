@@ -111,7 +111,8 @@ class RoomManager:
             "turn": 1,
             "deal": 1,
             "is_finished": False,
-            "ready": [False, False]
+            "ready": [False, False],
+            "deal_result": ""
         })
 
     async def authorize(self, ws: WebSocket, access_token: str):
@@ -164,8 +165,11 @@ class RoomManager:
         await self.send_game_state()
         winner_index = 0 if self.game_state.score[0] > self.game_state.score[1] else 1
         loser_index = 0 if winner_index == 1 else 1
+        print(winner_index)
         winner_username = self.game_state.players[winner_index]
         loser_username = self.game_state.players[loser_index]
+        self.game_state.winner = winner_username
+        await self.send_game_state()
         for connection in self.connection_list:
             if connection[1].username == winner_username:
                 winner_id = connection[1].id
@@ -228,10 +232,10 @@ class RoomManager:
             self.game_state.ready = [False, False]
             if self.game_state.dices_value[0] > self.game_state.dices_value[1]:
                 self.game_state.score[0] += 1
-                self.game_state.deal_result = "Player 1 gets the point"
+                self.game_state.deal_result = 0
             elif self.game_state.dices_value[0] < self.game_state.dices_value[1]:
                 self.game_state.score[1] += 1
-                self.game_state.deal_result = "Player 2 gets the point"
+                self.game_state.deal_result = 1
             else:
                 winning_index = compare_dices(
                     self.game_state.dices[0],
@@ -240,7 +244,7 @@ class RoomManager:
                 )
                 if winning_index >= 0:
                     self.game_state.score[winning_index] += 1
-                    self.game_state.deal_result = f"Player {str(winning_index+1)} gets the point"
+                    self.game_state.deal_result = winning_index
         if self.game_state.score[0] == 2 or self.game_state.score[1] == 2:
             await self.finish_game()
         self.game_state.current_player = 0 if self.game_state.current_player == 1 else 1

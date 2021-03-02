@@ -94,8 +94,11 @@ const MainPage = () => {
             <Container>
                 <Header>Room list</Header>
                 <Button type="submit" value="Create room " onClick={() => createRoom()} color="green" hoverColor="rgb(75, 245, 66)"/>
-                {roomList.map((roomId, index) => (
-                <Row key={index}><span>Room #{roomId}</span><WhiteLink to={`/room/${roomId}`}><SmallButton type="submit" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)" value="Join" /></WhiteLink></Row>
+                {roomList.map((room, index) => (
+                <Row key={index}><span>Room #{room.id}</span>
+                <span>Players: {room.players}</span>
+                <WhiteLink to={`/room/${room.id}`}><SmallButton type="submit" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)" value="Join" /></WhiteLink>
+                </Row>
                 ))}
             </Container>
         </ColumnContainer>

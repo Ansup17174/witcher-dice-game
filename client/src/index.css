@@ -30,8 +30,6 @@ input:-webkit-autofill {
   border-right: 4px solid transparent;
 }
 
-
-
 ::-webkit-scrollbar-thumb {
   background: rgb(60, 60, 60);
   border-radius: 20px;

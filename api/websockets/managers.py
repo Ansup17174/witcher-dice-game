@@ -124,6 +124,7 @@ class RoomManager:
             elif len(self.game_state.players) < 2:
                 self.game_state.players.append(user.username)
                 self.connection_list.append([ws, user])
+                await RoomListManager.send_to_all()
             else:
                 self.spectator_list.append(ws)
         except HTTPException:
@@ -267,21 +268,21 @@ class RoomManager:
 class RoomListManager:
 
     room_list: list[RoomManager] = []
+    connection_list: list[WebSocket] = []
 
-    def __init__(self):
-        self.connection_list: list[WebSocket] = []
-
-    async def send_to_all(self):
-        room_ids = [room.room_id for room in self.room_list]
-        for connection in self.connection_list:
+    @classmethod
+    async def send_to_all(cls):
+        rooms = [{"id": room.room_id, "players": len(room.game_state.players)} for room in cls.room_list]
+        for connection in cls.connection_list:
             try:
-                await connection.send_json(room_ids)
+                await connection.send_json(rooms)
             except ConnectionClosed:
-                self.connection_list.remove(connection)
+                cls.connection_list.remove(connection)
 
-    async def send_to_one(self, ws: WebSocket):
-        room_ids = [room.room_id for room in self.room_list]
-        await ws.send_json(room_ids)
+    @classmethod
+    async def send_to_one(cls, ws: WebSocket):
+        rooms = [{"id": room.room_id, "players": len(room.game_state.players)} for room in cls.room_list]
+        await ws.send_json(rooms)
 
     async def create_room(self):
         room_manager = RoomManager(str(uuid4()))
@@ -292,6 +293,7 @@ class RoomListManager:
         for room_manager in self.room_list:
             if room_manager.room_id == room_id:
                 self.room_list.remove(room_manager)
+                del room_manager
                 break
         await self.send_to_all()
 

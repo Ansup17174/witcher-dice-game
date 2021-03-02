@@ -30,12 +30,13 @@ const RoomPage = () => {
     });
 
     const {userData, NotificationManager, webSocketBase} = useContext(GlobalContext);
+    const spectatorMode = !gameState.players.includes(userData.username);
     const yourIndex = gameState.players.indexOf(userData.username) > -1 ? gameState.players.indexOf(userData.username) : 0;
     const opponentIndex = yourIndex ? 0 : 1;
     const roomWs = useRef(null);
 
     const reducer = (state, action) => {
-        if (!gameState.ready[0] || !gameState.ready[1] || gameState.current_player !== yourIndex) {
+        if (!gameState.ready[0] || !gameState.ready[1] || gameState.current_player !== yourIndex || spectatorMode) {
             return state;
         }
         switch (action.type) {
@@ -113,7 +114,8 @@ const RoomPage = () => {
                 <Header>
                     {gameState.players.length === 2 ? 
                     (gameState.ready[0] && gameState.ready[1] ? 
-                    (gameState.players[gameState.current_player] === userData.username ? "Your turn" : "Opponent's turn") : null)
+                    (spectatorMode ? `${gameState.players[gameState.current_player]}'s turn` :
+                        (gameState.players[gameState.current_player] === userData.username ? "Your turn" : "Opponent's turn")) : null)
                      : "Waiting for an opponent"}
                 </Header>
             <GameContainer>
@@ -146,10 +148,10 @@ const RoomPage = () => {
                     <DiceImage src={`/images/dice${gameState.dices[yourIndex][4]}.png`} alt={`dice${gameState.dices[0][4]}`}
                     selected={selectedDices[4]} onClick={() => dispatch({type: 4})}/>
                 </GameDices>
-                <GameText>You</GameText>
+                <GameText>{spectatorMode ? gameState.players[0] : "You"}</GameText>
                 <GameText>Pattern: {patterns[gameState.dices_value[yourIndex]]}</GameText>
             </GameContainer>
-            <GameButtons>
+            {!spectatorMode && <GameButtons>
                 {!gameState.ready[yourIndex] && gameState.score[0] !== 2 && gameState.score[1] !== 2 &&
                 <SmallButton type="submit" value="Ready" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)"
                 onClick={() => sendReady()}/>}
@@ -164,7 +166,7 @@ const RoomPage = () => {
                 && <SmallButton type="submit" value="Roll" color="green" hoverColor="rgb(75, 245, 66)"
                 onClick={() => sendDices()}/>}
                 {gameState.is_finished && <GameText>Game finished</GameText>}
-            </GameButtons>
+            </GameButtons>}
         </Container>
     );
 };

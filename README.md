@@ -1,4 +1,6 @@
 <h3>WebSocket based online dice game, inspired by The Witcher's dice game.</h3>
+Client written in React.
+API written in FastAPI with SQLAlchemy ORM.
 
 How to run locally:
 

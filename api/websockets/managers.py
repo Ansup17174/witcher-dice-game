@@ -167,7 +167,6 @@ class RoomManager:
     async def initialize_game(self):
         await self.reset_dices()
         self.game_state.current_player = 0
-        self.game_state.deal_result = ""
 
     async def finish_game(self, db: Session = SessionLocal()):
         self.game_state.is_finished = True

@@ -58,7 +58,6 @@ const App = () => {
 				console.log(error);
 				setUserData({});
 				console.log(token);
-				console.log("wtf");
 				localStorage.removeItem("dice-token");
 			});
 		}

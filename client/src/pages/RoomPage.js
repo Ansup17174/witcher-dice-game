@@ -131,10 +131,17 @@ const RoomPage = () => {
                 </GameDices>
             </GameContainer>
             <GameSpace>
-                {!gameState.is_finished && gameState.deal_result !== -1 && 
-                <Header>{gameState.players[gameState.deal_result]} gets the point</Header>}
+                {!gameState.is_finished && gameState.deal_result !== -1 && gameState.deal_result &&
+                    (!gameState.ready[0] || !gameState.ready[1]) &&
+                    <Header>{gameState.players[gameState.deal_result]} gets the point</Header>}
                 {gameState.winner && <GameText>{gameState.winner} wins</GameText>}
                 {!gameState.is_finished && gameState.deal_result === -1 && <Header>It's a tie!</Header>}
+                {gameState.players[0] && (!gameState.ready[0] || !gameState.ready[1]) && !gameState.is_finished &&
+                    <GameText>{gameState.ready[0] ? `${gameState.players[0]} ready` : `${gameState.players[0]} not ready`}</GameText>
+                }
+                {gameState.players[1] && (!gameState.ready[0] || !gameState.ready[1]) && !gameState.is_finished &&
+                    <GameText>{gameState.ready[1] ? `${gameState.players[1]} ready` : `${gameState.players[1]} not ready`}</GameText>
+                }
             </GameSpace>
             <GameContainer>
                 <GameDices>

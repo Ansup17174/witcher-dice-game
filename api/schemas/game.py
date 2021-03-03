@@ -13,4 +13,4 @@ class GameStateSchema(BaseModel):
     is_finished: bool
     winner: Optional[int] = None
     ready: list[bool, bool]
-    deal_result: Optional[str] = None
+    deal_result: Optional[int] = None

@@ -61,7 +61,7 @@ def times_in_array(n, array):  # Returns value that appears n-times in given arr
             return val
 
 
-def look_for_patterns(dices):
+def look_for_patterns(dices: list[int]) -> int:
     unique_dices = set(dices)
     if len(unique_dices) == 1:  # Poker
         return 8
@@ -82,7 +82,7 @@ def look_for_patterns(dices):
         for dice in dices:
             if dices.count(dice) == 2:  # Para
                 return 1
-    elif len(unique_dices) == 5:
+    else:
         if 6 not in dices:  # Maly St
             return 4
         elif 1 not in dices:  # Duzy St
@@ -91,7 +91,7 @@ def look_for_patterns(dices):
             return 0
 
 
-def compare_dices(dices1, dices2, pattern):
+def compare_dices(dices1: list[int], dices2: list[int], pattern: int) -> int:
     if dices1 == dices2:
         return -1
     if pattern == 8:  # Poker
@@ -111,6 +111,8 @@ def compare_dices(dices1, dices2, pattern):
                 return 0
             elif sum(dices1) < sum(dices2):
                 return 1
+            else:
+                return -1
     elif pattern == 6:
         if sum(dices1) > sum(dices2):
             return 0

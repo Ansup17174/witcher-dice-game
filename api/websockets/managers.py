@@ -113,7 +113,6 @@ class RoomManager:
             "deal": 1,
             "is_finished": False,
             "ready": [False, False],
-            "deal_result": ""
         })
 
     async def authorize(self, ws: WebSocket, access_token: str):
@@ -259,6 +258,8 @@ class RoomManager:
                 if winning_index >= 0:
                     self.game_state.score[winning_index] += 1
                     self.game_state.deal_result = winning_index
+                else:
+                    self.game_state.deal_result = -1
         if self.game_state.score[0] == 2 or self.game_state.score[1] == 2:
             await self.finish_game()
         self.game_state.current_player = 0 if self.game_state.current_player == 1 else 1

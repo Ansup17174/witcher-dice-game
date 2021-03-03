@@ -23,7 +23,7 @@ Create virtual env
 On windows:
 <pre>\> ./env/Scripts/activate.bat</pre>
 On Linux/MacOS:
-<pre>source env/Scripts/activate</pre>
+<pre>$ source env/Scripts/activate</pre>
 <pre>$ python -m pip install -r requirements.txt</pre>
 <pre>$ cd ..</pre>
 

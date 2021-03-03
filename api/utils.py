@@ -130,6 +130,8 @@ def compare_dices(dices1: list[int], dices2: list[int], pattern: int) -> int:
                 return 0
             elif sum(dices1) < sum(dices2):
                 return 1
+            else:
+                return -1
     elif pattern == 2:
         single_dice1 = times_in_array(1, dices1)
         single_dice2 = times_in_array(1, dices2)
@@ -141,11 +143,13 @@ def compare_dices(dices1: list[int], dices2: list[int], pattern: int) -> int:
             return 0
         elif sum(dices1_twopairs) < sum(dices2_twopairs):
             return 1
-        elif sum(dices1_twopairs) == sum(dices2_twopairs):
+        else:
             if single_dice1 > single_dice2:
                 return 0
             elif single_dice2 > single_dice1:
                 return 1
+            else:
+                return -1
     elif pattern == 1:
         dice1 = times_in_array(2, dices1)
         dice2 = times_in_array(2, dices2)
@@ -153,8 +157,10 @@ def compare_dices(dices1: list[int], dices2: list[int], pattern: int) -> int:
             return 0
         elif dice2 > dice1:
             return 1
-        elif dice1 == dice2:
+        else:
             if sum(dices1) > sum(dices2):
                 return 0
             elif sum(dices1) < sum(dices2):
                 return 1
+            else:
+                return -1

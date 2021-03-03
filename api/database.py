@@ -1,9 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from . import config
 
 
-database_url = "postgresql://dicegameuser:dicegamepassword@localhost/dicegame"
+database_url = config.DATABASE_URL
 engine = create_engine(database_url)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

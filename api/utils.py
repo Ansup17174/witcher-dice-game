@@ -16,8 +16,8 @@ def get_template(filename: str):
 
 
 def send_confirmation_mail(user: UserModel):
-    site = "dicegame.net"
-    confirmation_url = f"http://localhost:3000/confirm-email/{user.id}/{user.email.activation_token}"
+    site = config.SITE
+    confirmation_url = f"{config.FRONTEND_HOST}/confirm-email/{user.id}/{user.email.activation_token}"
     smtp = smtplib.SMTP(host=config.EMAIL_HOST, port=config.EMAIL_PORT)
     smtp.starttls()
     smtp.login(config.EMAIL_ADDRESS, config.EMAIL_PASSWORD)
@@ -38,7 +38,7 @@ def send_confirmation_mail(user: UserModel):
 
 def send_new_password(user: UserModel, password: str):
     params = {
-        "site": "dicegame.net",
+        "site": config.SITE,
         "username": user.username,
         "password": password
     }

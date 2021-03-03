@@ -9,3 +9,8 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_ADDRESS = "floppshop.confirmation@gmail.com"
 EMAIL_PASSWORD = "FloppShop123"
+
+SITE = "dicegame.net"
+FRONTEND_HOST = 'http://localhost:3000'
+
+DATABASE_URL = "postgresql://dicegameuser:dicegamepassword@localhost/dicegame"

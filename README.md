@@ -13,7 +13,7 @@ How to run locally:
 
 3. Install client dependencies:
 <pre>$ cd client</pre>
-<pre>npm install</pre>
+<pre>$ npm install</pre>
 <pre>$ cd ..</pre>
 
 4. Install api dependencies:

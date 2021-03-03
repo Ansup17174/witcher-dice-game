@@ -21,7 +21,7 @@ class UserProfileSchema(BaseModel):
 
 
 class UserSchema(BaseModel):
-    id: UUID
+    id: str
     username: str
     email: EmailSchema
     profile: UserProfileSchema

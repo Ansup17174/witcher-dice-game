@@ -9,7 +9,6 @@ from ..exceptions import auth_exception, get_unique_violation_exception
 from ..config import password_context
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from uuid import UUID
 
 
 user_router = APIRouter(
@@ -34,7 +33,7 @@ def resend(email_data: ResendEmailSchema, db: Session = Depends(get_db)):
 
 
 @user_router.post("/confirm-email/{user_id}/{token}")
-def confirm_email(user_id: UUID, token: str, db: Session = Depends(get_db)):
+def confirm_email(user_id: str, token: str, db: Session = Depends(get_db)):
     user_service.confirm_email(db=db, user_id=user_id, token=token)
     return {"detail": "Email confirmed successfully"}
 

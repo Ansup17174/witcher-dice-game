@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from ..schemas.users import UserRegisterSchema, ChangePasswordSchema
-from uuid import uuid4, UUID
+from uuid import uuid4
 from .. import config
 from ..models import UserModel, EmailModel, UserProfileModel
 from ..database import get_db
@@ -32,7 +32,7 @@ def expired_emails_cleanup(db: Session):
 
 def register_user(db: Session, user_data: UserRegisterSchema):
     hashed_password = password_context.hash(user_data.password1)
-    user_model = UserModel(id=uuid4(), username=user_data.username, password=hashed_password)
+    user_model = UserModel(id=str(uuid4()), username=user_data.username, password=hashed_password)
     db.add(user_model)
     email_token = str(uuid4())
     expiry_date = datetime.now() + timedelta(days=1)
@@ -92,7 +92,7 @@ def resend_verification_email(db: Session, email: str):
     send_confirmation_mail(user=user)
 
 
-def confirm_email(db: Session, user_id: UUID, token: str):
+def confirm_email(db: Session, user_id: str, token: str):
     conditions = [
         EmailModel.is_confirmed == False,
         EmailModel.activation_token == token,

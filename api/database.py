@@ -5,8 +5,11 @@ from . import config
 
 
 database_url = config.DATABASE_URL
-connect_args = {"check_same_thread": False} if config.DEFAULT_DATABASE_URL == config.DATABASE_URL else None
-engine = create_engine(database_url, connect_args={"check_same_thread": False})  # connect args for sqlite3
+
+if database_url == config.DEFAULT_DATABASE_URL:
+    engine = create_engine(database_url, connect_args={"check_same_thread": False})
+else:
+    engine = create_engine(database_url)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

@@ -16,3 +16,4 @@ FRONTEND_HOST = os.environ.get("FRONTEND_HOST")
 
 DEFAULT_DATABASE_URL = "sqlite:///" + os.path.join(os.getcwd(), "db.sqlite3")
 DATABASE_URL = os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URL)
+DATABASE_URL = DATABASE_URL if DATABASE_URL else DEFAULT_DATABASE_URL

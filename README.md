@@ -23,6 +23,7 @@ How to run locally:
 Create virtual env
 <pre>$ python -m venv env</pre>
 Activate venv
+</br>
 On windows:
 <pre>\> ./env/Scripts/activate.bat</pre>
 On Linux/MacOS:

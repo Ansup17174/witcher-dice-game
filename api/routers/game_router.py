@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi.websockets import WebSocket, WebSocketDisconnect
-from ..websockets.managers import OnlineUsersManager, PublicChatManager, RoomListManager
+from ..managers.managers import OnlineUsersManager, PublicChatManager, RoomListManager
 from ..services import user_service
 from ..models import UserModel
 import asyncio

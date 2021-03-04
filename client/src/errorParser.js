@@ -6,7 +6,6 @@ const parseErrors = (error, setErrors) => {
             });
             setErrors(errorObject);
         } else {
-            console.log(error.response.data);
             setErrors(error.response.data);
         }
 };

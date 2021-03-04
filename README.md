@@ -22,6 +22,7 @@ How to run locally:
 <pre>$ cd api</pre>
 Create virtual env
 <pre>$ python -m venv env</pre>
+Activate venv
 On windows:
 <pre>\> ./env/Scripts/activate.bat</pre>
 On Linux/MacOS:

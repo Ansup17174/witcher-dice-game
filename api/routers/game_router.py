@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.websockets import WebSocket, WebSocketDisconnect
-from ..managers.managers import OnlineUsersManager, PublicChatManager, RoomListManager
+from ..managers.general import OnlineUsersManager, PublicChatManager, RoomListManager
+from ..managers.witcher import WitcherRoomManager
 from ..services import user_service
 from ..models import UserModel
 import asyncio
@@ -16,8 +17,13 @@ room_list_manager = RoomListManager()
 
 
 @game_router.post("/create-room")
-async def create_room(user: UserModel = Depends(user_service.authenticate_user)):
-    await room_list_manager.create_room()
+async def create_room(room_type: str, user: UserModel = Depends(user_service.authenticate_user)):
+    room_types = {
+        "witcher": WitcherRoomManager
+    }
+    if room_type not in room_types.keys():
+        raise HTTPException(detail="Invalid room type", status_code=400)
+    await room_list_manager.create_room(room_types[room_type])
     return {"detail": "Room created!"}
 
 

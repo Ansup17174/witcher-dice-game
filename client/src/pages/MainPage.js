@@ -57,9 +57,12 @@ const MainPage = () => {
         }
     };
 
-    const createRoom = async () => {
+    const createRoom = async type => {
         const token = localStorage.getItem("dice-token");
-        await apiClient.post("/game/create-room", {}, {withCredentials: true, headers: {"Authorization": `Bearer ${token}`}})
+        await apiClient.post(
+            "/game/create-room",
+            {},
+            {withCredentials: true, params: {room_type: type}, headers: {"Authorization": `Bearer ${token}`}})
         .then(response => {
             NotificationManager.success("Room created!", null, 2000);
         })
@@ -93,7 +96,7 @@ const MainPage = () => {
             </Container>
             <Container>
                 <Header>Room list</Header>
-                <Button type="submit" value="Create room " onClick={() => createRoom()} color="green" hoverColor="rgb(75, 245, 66)"/>
+                <Button type="submit" value="Create room " onClick={() => createRoom("witcher")} color="green" hoverColor="rgb(75, 245, 66)"/>
                 {roomList.map((room, index) => (
                 <Row key={index}><span>Room #{room.id}</span>
                 <span>Players: {room.players}</span>

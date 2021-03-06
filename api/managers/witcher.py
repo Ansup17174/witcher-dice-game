@@ -98,12 +98,12 @@ class WitcherRoomManager:
                 winner_id = connection[1].id
             elif connection[1].username == loser_username:
                 loser_id = connection[1].id
-        winner_profile = user_service.get_user_profile(db=db, user_id=winner_id)
-        loser_profile = user_service.get_user_profile(db=db, user_id=loser_id)
-        winner_profile.matches_won += 1
-        winner_profile.matches_played += 1
-        loser_profile.matches_lost += 1
-        loser_profile.matches_played += 1
+        winner_stats = user_service.get_user_stats(db=db, user_id=winner_id, game="witcher")
+        loser_stats = user_service.get_user_stats(db=db, user_id=loser_id, game="witcher")
+        winner_stats.matches_won += 1
+        winner_stats.matches_played += 1
+        loser_stats.matches_lost += 1
+        loser_stats.matches_played += 1
         db.commit()
         for connection in self.connection_list:
             await connection[0].close()

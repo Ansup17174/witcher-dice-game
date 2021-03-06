@@ -10,7 +10,8 @@ class EmailSchema(BaseModel):
         orm_mode = True
 
 
-class UserProfileSchema(BaseModel):
+class UserStatsSchema(BaseModel):
+    game: str
     matches_won: int
     matches_lost: int
     matches_played: int
@@ -23,7 +24,6 @@ class UserSchema(BaseModel):
     id: str
     username: str
     email: EmailSchema
-    profile: UserProfileSchema
 
     class Config:
         orm_mode = True

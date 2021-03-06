@@ -4,7 +4,7 @@ from sqlalchemy import and_
 from ..schemas.users import UserRegisterSchema, ChangePasswordSchema
 from uuid import uuid4
 from .. import config
-from ..models import UserModel, EmailModel, UserProfileModel
+from ..models import UserModel, EmailModel, UserStatsModel
 from ..database import get_db
 from ..config import password_context
 from ..utils import send_confirmation_mail, send_new_password
@@ -43,8 +43,9 @@ def register_user(db: Session, user_data: UserRegisterSchema):
         expiry_date=expiry_date
     )
     db.add(email_model)
-    userprofile_model = UserProfileModel(user_id=user_model.id)
-    db.add(userprofile_model)
+    for game in config.GAMES:
+        user_stats_model = UserStatsModel(id=str(uuid4()), user_id=user_model.id, game=game)
+        db.add(user_stats_model)
     db.commit()
     send_confirmation_mail(user_model)
     return user_model
@@ -73,13 +74,9 @@ def get_email(db: Session, **kwargs):
     return get_emails(db, **kwargs).first()
 
 
-def get_user_profiles(db: Session, **kwargs):
-    conditions = [getattr(UserProfileModel, key) == value for key, value in kwargs.items()]
-    return db.query(UserProfileModel).filter(and_(*conditions))
-
-
-def get_user_profile(db: Session, **kwargs):
-    return get_user_profiles(db, **kwargs).first()
+def get_user_stats(db: Session, **kwargs):
+    conditions = [getattr(UserStatsModel, key) == value for key, value in kwargs.items()]
+    return db.query(UserStatsModel).filter(and_(*conditions)).all()
 
 
 def resend_verification_email(db: Session, email: str):

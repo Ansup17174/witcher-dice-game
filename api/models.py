@@ -10,15 +10,17 @@ class UserModel(Base):
     username = Column(String(50), unique=True, nullable=False)
     email = relationship("EmailModel", back_populates="user", uselist=False, cascade="all, delete")
     password = Column(String(100), nullable=False)
-    profile = relationship("UserProfileModel", back_populates="user", uselist=False, cascade="all, delete")
+    stats = relationship("UserStatsModel", back_populates="user", cascade="all, delete")
 
 
-class UserProfileModel(Base):
-    __tablename__ = "userprofiles"
+class UserStatsModel(Base):
+    __tablename__ = "userstats"
 
-    user = relationship("UserModel", back_populates="profile")
-    user_id = Column(String, ForeignKey("users.id"), primary_key=True)
+    user = relationship("UserModel", back_populates="stats")
+    user_id = Column(String, ForeignKey("users.id"))
 
+    id = Column(String, primary_key=True)
+    game = Column(String(50), nullable=False)
     matches_won = Column(Integer, server_default="0", nullable=False)
     matches_lost = Column(Integer, server_default="0", nullable=False)
     matches_played = Column(Integer, server_default="0", nullable=False)

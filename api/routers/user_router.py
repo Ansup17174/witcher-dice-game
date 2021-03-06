@@ -1,14 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from ..database import get_db
 from ..services import user_service
 from ..models import UserModel
 from ..schemas.users import (UserRegisterSchema, UserLoginSchema,
                              ResendEmailSchema, UserSchema, TokenSchema,
-                             ChangePasswordSchema, ResetPasswordSchema)
+                             ChangePasswordSchema, ResetPasswordSchema,
+                             UserStatsSchema)
 from ..exceptions import auth_exception, get_unique_violation_exception
 from ..config import password_context
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from typing import Optional
 
 
 user_router = APIRouter(
@@ -74,3 +76,17 @@ def login(data: UserLoginSchema, db: Session = Depends(get_db)):
 @user_router.get("/user", response_model=UserSchema)
 def get_user(user: UserModel = Depends(user_service.authenticate_user)):
     return user
+
+
+@user_router.get("/stats", response_model=list[UserStatsSchema])
+def get_user_stats(
+        game: Optional[str] = None,
+        user: UserModel = Depends(user_service.authenticate_user),
+        db: Session = Depends(get_db)
+):
+    print(game)
+    if game is not None:
+        user_stats = user_service.get_user_stats(db=db, user_id=user.id, game=game)
+        return user_stats
+    user_stats = user_service.get_user_stats(db=db, user_id=user.id)
+    return user_stats

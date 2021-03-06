@@ -19,3 +19,4 @@ DATABASE_URL = os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URL)
 DATABASE_URL = DATABASE_URL if DATABASE_URL else DEFAULT_DATABASE_URL
 
 BASE_DIR = os.path.join(os.getcwd(), "api")
+GAMES = ("witcher",)

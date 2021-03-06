@@ -6,16 +6,16 @@ from .models import UserModel
 from . import config
 import os
 
-base_dir = os.path.join(os.getcwd(), 'api')
-
 
 def get_template(filename: str):
-    with open(os.path.join(base_dir, filename), "r") as template_file:
+    with open(os.path.join(config.BASE_DIR, filename), "r") as template_file:
         template_file_content = template_file.read()
     return Template(template_file_content)
 
 
 def send_confirmation_mail(user: UserModel):
+    if config.EMAIL_HOST is None:
+        return
     site = config.SITE
     confirmation_url = f"{config.FRONTEND_HOST}/confirm-email/{user.id}/{user.email.activation_token}"
     smtp = smtplib.SMTP(host=config.EMAIL_HOST, port=config.EMAIL_PORT)

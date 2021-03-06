@@ -1,6 +1,7 @@
 from fastapi.websockets import WebSocket
 from websockets.exceptions import ConnectionClosed
 from fastapi import HTTPException
+from .general import RoomListManager
 from ..services import user_service
 from ..database import SessionLocal
 from ..models import UserModel
@@ -118,6 +119,35 @@ class WitcherRoomManager:
                 break
         return user
 
+    async def claim_readiness(self, player_index: int):
+        if self.game_state.ready != [True, True]:
+            self.game_state.ready[player_index] = True
+            if self.game_state.ready == [True, True]:
+                await self.initialize_game()
+            await self.send_game_state()
+
+    async def next_round(self):
+        self.game_state.turn = 1
+        self.game_state.deal += 1
+        self.game_state.ready = [False, False]
+        if self.game_state.dices_value[0] > self.game_state.dices_value[1]:
+            self.game_state.score[0] += 1
+            self.game_state.deal_result = 0
+        elif self.game_state.dices_value[0] < self.game_state.dices_value[1]:
+            self.game_state.score[1] += 1
+            self.game_state.deal_result = 1
+        else:
+            winning_index = compare_dices(
+                self.game_state.dices[0],
+                self.game_state.dices[1],
+                self.game_state.dices_value[0]
+            )
+            if winning_index >= 0:
+                self.game_state.score[winning_index] += 1
+                self.game_state.deal_result = winning_index
+            else:
+                self.game_state.deal_result = -1
+
     async def dispatch(self, data: dict, ws: WebSocket):
         actions = ['roll', 'pass', 'surrender', 'tie', 'ready', 'authorize']
         action = data.get('action')
@@ -135,11 +165,7 @@ class WitcherRoomManager:
             await self.send_game_state()
             return
         if action == 'ready':
-            if self.game_state.ready != [True, True]:
-                self.game_state.ready[player_index] = True
-                if self.game_state.ready == [True, True]:
-                    await self.initialize_game()
-                await self.send_game_state()
+            await self.claim_readiness(player_index)
             return
         if player_index != self.game_state.current_player:
             await self.send_game_state()
@@ -154,26 +180,7 @@ class WitcherRoomManager:
             await self.send_game_state()
         self.game_state.turn += 1
         if self.game_state.turn == 5:
-            self.game_state.turn = 1
-            self.game_state.deal += 1
-            self.game_state.ready = [False, False]
-            if self.game_state.dices_value[0] > self.game_state.dices_value[1]:
-                self.game_state.score[0] += 1
-                self.game_state.deal_result = 0
-            elif self.game_state.dices_value[0] < self.game_state.dices_value[1]:
-                self.game_state.score[1] += 1
-                self.game_state.deal_result = 1
-            else:
-                winning_index = compare_dices(
-                    self.game_state.dices[0],
-                    self.game_state.dices[1],
-                    self.game_state.dices_value[0]
-                )
-                if winning_index >= 0:
-                    self.game_state.score[winning_index] += 1
-                    self.game_state.deal_result = winning_index
-                else:
-                    self.game_state.deal_result = -1
+            await self.next_round()
         if self.game_state.score[0] == 2 or self.game_state.score[1] == 2:
             await self.finish_game()
         self.game_state.current_player = 0 if self.game_state.current_player == 1 else 1

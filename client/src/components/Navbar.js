@@ -15,10 +15,11 @@ let Navbar = ({className}) => {
 
     return (
         <div className={className}>
-            <Logo to="/">Dice game</Logo>
+            <Logo to="/">Game center</Logo>
             <NavbarLinks>
                 {userData.id && <NavbarLink to="/change-password">Change password</NavbarLink>}
                 {userData.id && <NavbarLink to="/profile">Profile</NavbarLink>}
+                <NavbarLink to="/ranking"></NavbarLink>
                 <NavbarLink to="/register">Register</NavbarLink>
                 {userData.id && <NavbarLink onClick={logout}>Logout</NavbarLink>}
             </NavbarLinks>

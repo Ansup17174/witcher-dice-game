@@ -1,15 +1,15 @@
 import {Form, FormField, FormHeader, Input, FormError, FormText} from './form';
-import {useState, useContext} from 'react';
-import Button from '../components/Button';
-import GlobalContext from '../GlobalContext';
-import apiClient from '../apiclient';
+import {useState} from 'react';
+import Button from '../Button';
+import useGlobalContext from '../../GlobalContext';
+import apiClient from '../../apiclient';
 
 const ResendForm = () => {
 
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
 
-    const {NotificationManager} = useContext(GlobalContext);
+    const {NotificationManager} = useGlobalContext();
 
     const reSend = async e => {
         e.preventDefault();

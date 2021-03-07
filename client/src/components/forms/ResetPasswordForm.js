@@ -1,15 +1,15 @@
-import {useState, useContext} from 'react';
+import {useState} from 'react';
 import {Form, FormField, FormHeader, Input, FormText, FormError} from './form';
-import Button from '../components/Button';
-import apiClient from '../apiclient';
-import GlobalContext from '../GlobalContext';
-import parseErrors from '../errorParser';
+import Button from '../Button';
+import apiClient from '../../apiclient';
+import useGlobalContext from '../../GlobalContext';
+import parseErrors from '../../errorParser';
 
 const ResetPasswordForm = () => {
 
     const [email, setEmail] = useState("");
     const [error, setError] = useState({});
-    const {NotificationManager} = useContext(GlobalContext);
+    const {NotificationManager} = useGlobalContext();
 
     const resetPassword = async e => {
         e.preventDefault();

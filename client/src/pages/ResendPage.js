@@ -1,4 +1,4 @@
-import ResendForm from '../components/ResendForm';
+import ResendForm from '../components/forms/ResendForm';
 
 const ResendPage = () => {
     return <ResendForm />;

@@ -1,6 +1,6 @@
-import {useState, useContext, useEffect} from 'react';
+import {useState, useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
-import GlobalContext from '../GlobalContext';
+import useGlobalContext from '../GlobalContext';
 import {Container, Row} from '../components/containers';
 import Header from '../components/Header';
 
@@ -17,7 +17,7 @@ const ProfilePage = () => {
             matches_played: 0
         }
     })
-    const {userData} = useContext(GlobalContext);
+    const {userData} = useGlobalContext();
     const history = useHistory();
 
     useEffect(() => {

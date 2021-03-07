@@ -1,5 +1,5 @@
-import {useState, useEffect, useContext, useRef} from 'react';
-import GlobalContext from '../GlobalContext';
+import {useState, useEffect, useRef} from 'react';
+import useGlobalContext from '../GlobalContext';
 import Button from '../components/Button';
 import SmallButton from '../components/SmallButton';
 import WhiteLink from '../components/WhiteLink';
@@ -15,7 +15,7 @@ const MainPage = () => {
     const [chatState, setChatState] = useState([]);
     const [chatInput, setChatInput] = useState("");
     const [roomList, setRoomList] = useState([]);
-    const {webSocketBase, NotificationManager, onlineUsers} = useContext(GlobalContext);
+    const {webSocketBase, NotificationManager, onlineUsers} = useGlobalContext();
     const chatDiv = useRef(null);
 
     useEffect(() => {

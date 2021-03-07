@@ -7,11 +7,12 @@ import ChangePasswordPage from './pages/ChangePasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import NotFound from './pages/NotFound';
 import ProfilePage from './pages/ProfilePage';
-import GlobalContext from './GlobalContext';
+import {GlobalContext} from './GlobalContext';
 import apiClient from './apiclient';
 import ConfirmEmail from './pages/ConfirmEmail';
 import ResendPage from './pages/ResendPage';
 import RoomPage from './pages/RoomPage';
+import RankingPage from './pages/RankingPage';
 import Navbar from './components/Navbar';
 import 'react-notifications/lib/notifications.css';
 import {NotificationManager, NotificationContainer} from 'react-notifications';
@@ -90,6 +91,7 @@ const App = () => {
 					<Route path="/" component={userData.id ? MainPage : LoginPage} exact />
 					<Route path="/register" component={RegisterPage} exact />
 					<Route path="/profile" component={ProfilePage} exact />
+					<Route path="/ranking" component={RankingPage} exact />
 					<Route path="/room/:roomId" component={RoomPage} exact />
 					<Route path="/change-password" component={ChangePasswordPage} exact />
 					<Route path="/reset-password" component={ResetPasswordPage} exact />

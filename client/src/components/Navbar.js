@@ -1,11 +1,10 @@
 import styled from 'styled-components';
-import {useContext} from 'react';
-import GlobalContext from '../GlobalContext';
+import useGlobalContext from '../GlobalContext';
 import {NavbarLinks, NavbarLink, Logo} from './navbars';
 
 let Navbar = ({className}) => {
 
-    const {userData, setUserData, NotificationManager} = useContext(GlobalContext);
+    const {userData, setUserData, NotificationManager} = useGlobalContext();
 
     const logout = () => {
         localStorage.removeItem("dice-token");
@@ -19,7 +18,7 @@ let Navbar = ({className}) => {
             <NavbarLinks>
                 {userData.id && <NavbarLink to="/change-password">Change password</NavbarLink>}
                 {userData.id && <NavbarLink to="/profile">Profile</NavbarLink>}
-                <NavbarLink to="/ranking"></NavbarLink>
+                <NavbarLink to="/ranking">Ranking</NavbarLink>
                 <NavbarLink to="/register">Register</NavbarLink>
                 {userData.id && <NavbarLink onClick={logout}>Logout</NavbarLink>}
             </NavbarLinks>

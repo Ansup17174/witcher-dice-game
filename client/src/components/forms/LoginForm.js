@@ -1,15 +1,15 @@
-import {useState, useContext} from 'react';
+import {useState} from 'react';
 import {Form, FormHeader, FormField, FormError, FormText, Input, FormLink} from './form';
-import Button from './Button';
-import GlobalContext from '../GlobalContext';
-import apiClient from '../apiclient';
+import Button from '../Button';
+import useGlobalContext from '../../GlobalContext';
+import apiClient from '../../apiclient';
 
 
 const LoginForm = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
-    const {getUserData, NotificationManager} = useContext(GlobalContext);
+    const {getUserData, NotificationManager} = useGlobalContext();
 
     const login = async e => {
         e.preventDefault();

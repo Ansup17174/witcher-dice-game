@@ -1,9 +1,9 @@
-import {useReducer, useContext, useState} from 'react';
+import {useReducer,  useState} from 'react';
 import {Form, FormHeader, FormField, FormError, FormText, Input, FormLink} from './form';
-import GlobalContext from '../GlobalContext';
-import Button from '../components/Button';
-import apiClient from '../apiclient';
-import parseErrors from '../errorParser';
+import useGlobalContext from '../../GlobalContext';
+import Button from '../Button';
+import apiClient from '../../apiclient';
+import parseErrors from '../../errorParser';
 
 
 const RegisterForm = () => {
@@ -33,7 +33,7 @@ const RegisterForm = () => {
 
     const {username, email, password1, password2} = formState;
 
-    const {NotificationManager} = useContext(GlobalContext);
+    const {NotificationManager} = useGlobalContext();
 
     const register = async e => {
         e.preventDefault();

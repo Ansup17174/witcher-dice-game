@@ -1,5 +1,5 @@
-import {useState, useEffect, useReducer, useContext, useRef} from 'react';
-import GlobalContext from '../GlobalContext';
+import {useState, useEffect, useReducer, useRef} from 'react';
+import useGlobalContext from '../GlobalContext';
 import {GameContainer, GameButtons, GameDices, GameSpace, DiceImage, GameText} from '../components/game';
 import {useParams, useHistory} from 'react-router-dom';
 import {Container} from '../components/containers';
@@ -29,7 +29,7 @@ const RoomPage = () => {
         winner: null
     });
 
-    const {userData, NotificationManager, webSocketBase} = useContext(GlobalContext);
+    const {userData, NotificationManager, webSocketBase} = useGlobalContext();
     const spectatorMode = !gameState.players.includes(userData.username);
     const yourIndex = gameState.players.indexOf(userData.username) > -1 ? gameState.players.indexOf(userData.username) : 0;
     const opponentIndex = yourIndex ? 0 : 1;

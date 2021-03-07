@@ -1,8 +1,8 @@
-import {useState, useContext} from 'react';
+import {useState} from 'react';
 import {useHistory} from 'react-router-dom';
-import {Form, FormError, FormField, FormHeader, FormText, Input} from '../components/form';
+import {Form, FormError, FormField, FormHeader, FormText, Input} from '../components/forms/form';
 import Button from '../components/Button';
-import GlobalContext from '../GlobalContext';
+import useGlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
 import parseErrors from '../errorParser';
 
@@ -13,7 +13,7 @@ const ChangePasswordPage = () => {
     const [newPassword2, setNewPassword2] = useState("");
     const [errors, setErrors] = useState("");
     const history = useHistory();
-    const {NotificationManager} = useContext(GlobalContext);
+    const {NotificationManager} = useGlobalContext();
 
     const changePassword = async e => {
         e.preventDefault();

@@ -6,12 +6,17 @@ import useGlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
 import Header from '../components/Header';
 import {Container} from '../components/containers';
+import PageButton from '../components/page/PageButton';
+import PageButtons from '../components/page/PageButtons';
+import PageInput from '../components/page/PageInput';
+
 
 const RankingPage = () => {
     const [rows, setRows] = useState([]);
+    const [page, setPage] = useState(1);
 
     const getRows = async () => {
-        await apiClient.get("/game/ranking")
+        await apiClient.get("/game/ranking", {params: {limit: 10, offset: (page-1)*10}})
         .then(response => {
             setRows(response.data);
         })
@@ -21,7 +26,12 @@ const RankingPage = () => {
     };
     const {NotificationManager} = useGlobalContext();
 
-    useEffect(() => getRows());
+    useEffect(() => getRows(), [page]);
+
+    const changePage = async number => {
+        if (!Number.isInteger(Number.parseInt(number)) || number < 1) return;
+        else setPage(Number.parseInt(number));
+    };
 
     return (
         <Container>
@@ -36,6 +46,11 @@ const RankingPage = () => {
                 </RankingHeader>
                 {rows.map((row, index) => <RankingRow key={index} stats={row}/>)}
             </RankingTable>
+            <PageButtons>
+                <PageButton onClick={() => changePage(page-1)}>&lt;</PageButton>
+                <PageInput type="number" value={page} onChange={e => changePage(e.target.value)}/>
+                <PageButton onClick={() => changePage(page+1)}>&gt;</PageButton>
+            </PageButtons>
         </Container>
     );
 };

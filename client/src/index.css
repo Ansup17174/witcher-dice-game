@@ -34,3 +34,9 @@ input:-webkit-autofill {
   background: rgb(60, 60, 60);
   border-radius: 20px;
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

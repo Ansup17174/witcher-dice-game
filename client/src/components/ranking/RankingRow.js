@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
 let RankingRow = ({stats, className}) => {
-    console.log(stats)
     return (
         <tr className={className}>
             <td>{stats.username}</td>

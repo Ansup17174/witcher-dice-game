@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react';
 import RankingRow from '../components/ranking/RankingRow';
 import RankingTable from '../components/ranking/RankingTable';
 import RankingHeader from '../components/ranking/RankingHeader';
+import RankingSelect from '../components/ranking/RankingSelect';
 import useGlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
 import Header from '../components/Header';
@@ -14,9 +15,12 @@ import PageInput from '../components/page/PageInput';
 const RankingPage = () => {
     const [rows, setRows] = useState([]);
     const [page, setPage] = useState(1);
+    const [selectValue, setSelectValue] = useState("-");
 
     const getRows = async () => {
-        await apiClient.get("/game/ranking", {params: {limit: 10, offset: (page-1)*10}})
+        await apiClient.get("/game/ranking",
+            {params: {limit: 10, offset: (page-1)*10, game: selectValue !== "-" ? selectValue: null}}
+        )
         .then(response => {
             setRows(response.data);
         })
@@ -26,7 +30,7 @@ const RankingPage = () => {
     };
     const {NotificationManager} = useGlobalContext();
 
-    useEffect(() => getRows(), [page]);
+    useEffect(() => getRows(), [page, selectValue]);
 
     const changePage = async number => {
         if (!Number.isInteger(Number.parseInt(number)) || number < 1) return;
@@ -36,6 +40,11 @@ const RankingPage = () => {
     return (
         <Container>
             <Header>Ranking</Header>
+            <RankingSelect value={selectValue} onChange={e => setSelectValue(e.target.value)}>
+                <option disabled defaultValue>-</option>
+                <option>Witcher dice</option>
+                <option>Tic-tac-toe</option>
+            </RankingSelect>
             <RankingTable>
                 <RankingHeader>
                     <th>Username</th>

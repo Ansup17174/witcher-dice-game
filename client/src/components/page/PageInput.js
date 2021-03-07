@@ -5,8 +5,8 @@ const PageInput = styled.input`
     font-size: 20px;
     text-align: center;
     padding: 5px;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     background-color: rgb(33, 33, 33);
     outline: none;
     border: none;

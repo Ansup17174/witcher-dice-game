@@ -6,9 +6,9 @@ const PageButton = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 50px;
-    height: 50px;
-    margin: 0 50px;
+    width: 40px;
+    height: 40px;
+    margin: 0 30px;
     font-weight: bold;
     font-size: 20px;
     cursor: pointer;

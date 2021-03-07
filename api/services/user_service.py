@@ -74,9 +74,9 @@ def get_email(db: Session, **kwargs):
     return get_emails(db, **kwargs).first()
 
 
-def get_user_stats(db: Session, **kwargs):
-    conditions = [getattr(UserStatsModel, key) == value for key, value in kwargs.items()]
-    return db.query(UserStatsModel).filter(and_(*conditions)).all()
+def get_user_stats(db: Session, limit: int, offset: int, **kwargs):
+    conditions = [getattr(UserStatsModel, key) == value for key, value in kwargs.items() if value is not None]
+    return db.query(UserStatsModel).filter(and_(*conditions)).offset(offset).limit(limit).all()
 
 
 def resend_verification_email(db: Session, email: str):

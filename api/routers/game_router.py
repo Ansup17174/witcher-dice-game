@@ -4,7 +4,12 @@ from ..managers.general import OnlineUsersManager, PublicChatManager, RoomListMa
 from ..managers.witcher import WitcherRoomManager
 from ..services import user_service
 from ..models import UserModel
+from ..schemas.users import UserStatsSchema
+from ..database import get_db
 import asyncio
+from sqlalchemy.orm import Session
+from typing import Optional
+
 
 game_router = APIRouter(
     prefix="/game",
@@ -16,10 +21,26 @@ public_chat_manager = PublicChatManager()
 room_list_manager = RoomListManager()
 
 
+@game_router.get("/ranking")
+def get_ranking(
+        limit: Optional[int] = 10,
+        offset: Optional[int] = 0,
+        game: Optional[str] = None,
+        db: Session = Depends(get_db)
+):
+    limit = limit if limit >= 0 else 10
+    offset = offset if offset >= 0 else 0
+    stats_models = user_service.get_user_stats(db=db, limit=limit, offset=offset, game=game)
+    response_list = [{**UserStatsSchema.from_orm(stats).dict(), "username": stats.user.username}
+                     for stats in stats_models]
+    response_list.sort(key=lambda stats: stats['matches_won'], reverse=True)
+    return response_list
+
+
 @game_router.post("/create-room")
 async def create_room(room_type: str, user: UserModel = Depends(user_service.authenticate_user)):
     room_types = {
-        "witcher": WitcherRoomManager
+        "Witcher-dice": WitcherRoomManager
     }
     if room_type not in room_types.keys():
         raise HTTPException(detail="Invalid room type", status_code=400)

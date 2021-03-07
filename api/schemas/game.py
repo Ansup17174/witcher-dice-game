@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class GameStateSchema(BaseModel):
+class WitcherGameSchema(BaseModel):
     players: list[str]
     score: list[int]
     dices: list[list[int]]
@@ -12,5 +12,18 @@ class GameStateSchema(BaseModel):
     deal: int
     is_finished: bool
     winner: Optional[int] = None
-    ready: list[bool, bool]
+    ready: list[bool]
     deal_result: Optional[int] = None
+    max_players: int
+
+
+class TicTacToeGameSchema(BaseModel):
+    players: list[str]
+    score: list[int]
+    board: list[Optional[int]]
+    current_player: int
+    round: int
+    is_finished: bool
+    winner: Optional[int] = None
+    ready: list[bool]
+    max_players: int

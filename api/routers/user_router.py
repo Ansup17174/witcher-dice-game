@@ -78,15 +78,18 @@ def get_user(user: UserModel = Depends(user_service.authenticate_user)):
     return user
 
 
-@user_router.get("/stats", response_model=list[UserStatsSchema])
+@user_router.get("/mystats", response_model=list[UserStatsSchema])
 def get_user_stats(
         game: Optional[str] = None,
+        limit: Optional[int] = 10,
+        offset: Optional[int] = 0,
         user: UserModel = Depends(user_service.authenticate_user),
         db: Session = Depends(get_db)
 ):
-    print(game)
+    limit = limit if limit >= 0 else 10
+    offset = offset if offset >= 0 else 0
     if game is not None:
-        user_stats = user_service.get_user_stats(db=db, user_id=user.id, game=game)
+        user_stats = user_service.get_user_stats(db=db, user_id=user.id, game=game, limit=limit, offset=offset)
         return user_stats
-    user_stats = user_service.get_user_stats(db=db, user_id=user.id)
+    user_stats = user_service.get_user_stats(db=db, user_id=user.id, limit=limit, offset=offset)
     return user_stats

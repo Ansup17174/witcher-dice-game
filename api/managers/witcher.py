@@ -5,7 +5,7 @@ from .general import RoomListManager
 from ..services import user_service
 from ..database import SessionLocal
 from ..models import UserModel
-from ..schemas.game import GameStateSchema
+from ..schemas.game import WitcherGameSchema
 from ..utils import look_for_patterns, compare_dices
 from sqlalchemy.orm import Session
 import random
@@ -16,7 +16,7 @@ class WitcherRoomManager:
         self.room_id: str = room_id
         self.spectator_list: list[WebSocket] = []
         self.connection_list: list[list[WebSocket, UserModel]] = []
-        self.game_state: GameStateSchema = GameStateSchema(**{
+        self.game_state: WitcherGameSchema = WitcherGameSchema(**{
             "players": [],
             "score": [0, 0],
             "dices": [
@@ -29,14 +29,15 @@ class WitcherRoomManager:
             "deal": 1,
             "is_finished": False,
             "ready": [False, False],
+            "max_players": 2
         })
 
-    async def authorize(self, ws: WebSocket, access_token: str):
+    async def authorize(self, ws: WebSocket, access_token: str, db: Session = SessionLocal()):
         try:
-            user = user_service.authenticate_user(token=access_token, db=SessionLocal())
+            user = user_service.authenticate_user(token=access_token, db=db)
             if user.username in self.game_state.players:
                 self.connection_list.append([ws, user])
-            elif len(self.game_state.players) < 2:
+            elif len(self.game_state.players) < self.game_state.max_players:
                 self.game_state.players.append(user.username)
                 self.connection_list.append([ws, user])
                 await RoomListManager.send_to_all()
@@ -47,6 +48,7 @@ class WitcherRoomManager:
             self.spectator_list.append(ws)
         finally:
             await self.send_game_state()
+            db.close()
 
     async def disconnect(self, ws: WebSocket):
         for connection in self.connection_list:
@@ -98,8 +100,20 @@ class WitcherRoomManager:
                 winner_id = connection[1].id
             elif connection[1].username == loser_username:
                 loser_id = connection[1].id
-        winner_stats = user_service.get_user_stats(db=db, user_id=winner_id, game="witcher")
-        loser_stats = user_service.get_user_stats(db=db, user_id=loser_id, game="witcher")
+        winner_stats = user_service.get_user_stats(
+            db=db,
+            user_id=winner_id,
+            game="Witcher dice",
+            limit=1,
+            offset=0
+        )[0]
+        loser_stats = user_service.get_user_stats(
+            db=db,
+            user_id=loser_id,
+            game="Witcher dice",
+            limit=1,
+            offset=0
+        )[0]
         winner_stats.matches_won += 1
         winner_stats.matches_played += 1
         loser_stats.matches_lost += 1

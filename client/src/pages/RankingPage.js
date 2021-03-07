@@ -3,6 +3,7 @@ import RankingRow from '../components/ranking/RankingRow';
 import RankingTable from '../components/ranking/RankingTable';
 import RankingHeader from '../components/ranking/RankingHeader';
 import RankingSelect from '../components/ranking/RankingSelect';
+import RowHeader from '../components/ranking/RowHeader';
 import useGlobalContext from '../GlobalContext';
 import apiClient from '../apiclient';
 import Header from '../components/Header';
@@ -21,7 +22,7 @@ const RankingPage = () => {
         await apiClient.get("/game/ranking",
             {params: {limit: 10, offset: (page-1)*10, game: selectValue !== "-" ? selectValue: null}}
         )
-        .then(response => {
+        .then(response => { 
             setRows(response.data);
         })
         .catch(error => {
@@ -47,11 +48,11 @@ const RankingPage = () => {
             </RankingSelect>
             <RankingTable>
                 <RankingHeader>
-                    <th>Username</th>
-                    <th>Game</th>
-                    <th>Matches won</th>
-                    <th>Matches lost</th>
-                    <th>Matches played</th>
+                    <RowHeader>Username</RowHeader>
+                    <RowHeader>Game</RowHeader>
+                    <RowHeader>Matches won</RowHeader>
+                    <RowHeader>Matches lost</RowHeader>
+                    <RowHeader>Matches played</RowHeader>
                 </RankingHeader>
                 {rows.map((row, index) => <RankingRow key={index} stats={row}/>)}
             </RankingTable>

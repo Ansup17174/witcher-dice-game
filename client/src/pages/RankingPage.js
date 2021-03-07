@@ -43,7 +43,7 @@ const RankingPage = () => {
             <Header>Ranking</Header>
             <RankingSelect value={selectValue} onChange={e => setSelectValue(e.target.value)}>
                 <option disabled defaultValue>-</option>
-                <option>Witcher dice</option>
+                <option>Witcher-dice</option>
                 <option>Tic-tac-toe</option>
             </RankingSelect>
             <RankingTable>

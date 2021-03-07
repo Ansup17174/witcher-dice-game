@@ -4,7 +4,7 @@ const Button = styled.input`
     color: white;
     background-color: ${props => props.color};
     padding: 20px 60px;
-    margin: 10px 0;
+    margin: 20px 0;
     font-size: 20px;
     outline: none;
     border: none;

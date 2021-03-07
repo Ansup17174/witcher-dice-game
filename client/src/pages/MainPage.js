@@ -3,6 +3,7 @@ import useGlobalContext from '../GlobalContext';
 import Button from '../components/Button';
 import SmallButton from '../components/SmallButton';
 import WhiteLink from '../components/WhiteLink';
+import RankingSelect from '../components/ranking/RankingSelect';
 import {Container, ColumnContainer, Row} from '../components/containers';
 import Header from '../components/Header';
 import {ChatArea, ChatInput, ChatSubmit} from '../components/game';
@@ -12,6 +13,7 @@ const MainPage = () => {
 
     const chatWs = useRef(null);
     const roomListWs = useRef(null);
+    const [select, setSelect] = useState("-");
     const [chatState, setChatState] = useState([]);
     const [chatInput, setChatInput] = useState("");
     const [roomList, setRoomList] = useState([]);
@@ -96,7 +98,14 @@ const MainPage = () => {
             </Container>
             <Container>
                 <Header>Room list</Header>
-                <Button type="submit" value="Create room " onClick={() => createRoom("witcher")} color="green" hoverColor="rgb(75, 245, 66)"/>
+                <div>
+                <RankingSelect value={select} onChange={e => setSelect(e.target.value)}>
+                    <option defaultValue disabled>-</option>
+                    <option>Witcher-dice</option>
+                    <option>Tic-tac-toe</option>
+                </RankingSelect> 
+                </div>
+                <Button type="submit" value="Create room " onClick={() => createRoom(select)} color="green" hoverColor="rgb(75, 245, 66)"/>
                 {roomList.map((room, index) => (
                 <Row key={index}><span>Room #{room.id}</span>
                 <span>Players: {room.players}</span>

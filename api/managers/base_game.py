@@ -5,13 +5,11 @@ from .general import RoomListManager
 from ..services import user_service
 from ..database import SessionLocal
 from ..models import UserModel
-
-from ..utils import look_for_patterns, compare_dices
 from sqlalchemy.orm import Session
-import random
+from abc import ABC, abstractmethod
 
 
-class BaseRoomManager:
+class BaseRoomManager(ABC):
     def __init__(self, room_id: str):
         """self.game_state has to be assigned"""
         self.room_id: str = room_id
@@ -54,10 +52,12 @@ class BaseRoomManager:
             except ConnectionClosed:
                 pass
 
+    @abstractmethod
     async def initialize_game(self):
         """Must be implemented"""
-        raise NotImplementedError()
+        raise NotImplementedError("function initialize_game has to be implemented")
 
+    @abstractmethod
     async def finish_game(self, db: Session = SessionLocal()):
         raise NotImplementedError("function finish_game has to be implemented")
 
@@ -76,5 +76,6 @@ class BaseRoomManager:
                 await self.initialize_game()
             await self.send_game_state()
 
+    @abstractmethod
     async def dispatch(self, data: dict, ws: WebSocket):
         raise NotImplementedError("function dispatch has to be implemented")

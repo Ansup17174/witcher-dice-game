@@ -7,6 +7,7 @@ from ..database import SessionLocal
 from ..models import UserModel
 from ..schemas.game import WitcherGameSchema
 from ..utils import look_for_patterns, compare_dices
+from .base_game import BaseRoomManager
 from sqlalchemy.orm import Session
 import random
 

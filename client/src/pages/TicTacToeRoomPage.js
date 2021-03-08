@@ -71,8 +71,8 @@ const TicTacToeRoomPage = ({roomId}) => {
                 </Header>
             <GameContainer>
                 <ImagesRow>
-                    <GameText><SmallTicTacToeImage src={`/images/${yourIndex}.png`} />You</GameText>
-                    <GameText><SmallTicTacToeImage src={`/images/${opponentIndex}.png`} />{gameState.players[opponentIndex]}</GameText>
+                    {!spectatorMode && <GameText><SmallTicTacToeImage src={`/images/${yourIndex}.png`} />You</GameText>}
+                    {gameState.players[1] !== undefined && <GameText><SmallTicTacToeImage src={`/images/${opponentIndex}.png`} />{gameState.players[opponentIndex]}</GameText>}
                 </ImagesRow>
             </GameContainer>
             <GameSpace>
@@ -90,28 +90,28 @@ const TicTacToeRoomPage = ({roomId}) => {
             </GameSpace>
             <TicTacToeTable>
                 <TicTacToeRow>
-                    <TicTacToeImage src={gameState.board[0] ? `/images/${gameState.board[0]}.png` : "/images/blank.png"}
+                    <TicTacToeImage src={gameState.board[0] !== null ? `/images/${gameState.board[0]}.png` : "/images/blank.png"}
                      onClick={() => makeMove(0)}/>
-                    <TicTacToeImage src={gameState.board[1] ? `/images/${gameState.board[1]}.png` : "/images/blank.png"}
+                    <TicTacToeImage src={gameState.board[1] !== null ? `/images/${gameState.board[1]}.png` : "/images/blank.png"}
                      onClick={() => makeMove(1)}/>
-                    <TicTacToeImage src={gameState.board[2] ? `/images/${gameState.board[2]}.png` : "/images/blank.png"}
+                    <TicTacToeImage src={gameState.board[2] !== null ? `/images/${gameState.board[2]}.png` : "/images/blank.png"}
                      onClick={() => makeMove(2)}/>
                 </TicTacToeRow>
                 <TicTacToeRow>
-                <TicTacToeImage src={gameState.board[3] ? `/images/${gameState.board[3]}.png` : "/images/blank.png"}
+                <TicTacToeImage src={gameState.board[3] !== null ? `/images/${gameState.board[3]}.png` : "/images/blank.png"}
                      onClick={() => makeMove(3)}/>
-                    <TicTacToeImage src={gameState.board[4] ? `/images/${gameState.board[4]}.png` : "/images/blank.png"}
+                    <TicTacToeImage src={gameState.board[4] !== null ? `/images/${gameState.board[4]}.png` : "/images/blank.png"}
                      onClick={() => makeMove(4)}/>
-                    <TicTacToeImage src={gameState.board[4] ? `/images/${gameState.board[4]}.png` : "/images/blank.png"}
-                     onClick={() => makeMove(4)}/>
+                    <TicTacToeImage src={gameState.board[5] !== null ? `/images/${gameState.board[5]}.png` : "/images/blank.png"}
+                     onClick={() => makeMove(5)}/>
                 </TicTacToeRow>
                 <TicTacToeRow>
-                <TicTacToeImage src={gameState.board[5] ? `/images/${gameState.board[5]}.png` : "/images/blank.png"}
-                     onClick={() => makeMove(5)}/>
-                    <TicTacToeImage src={gameState.board[6] ? `/images/${gameState.board[6]}.png` : "/images/blank.png"}
+                <TicTacToeImage src={gameState.board[6] !== null ? `/images/${gameState.board[6]}.png` : "/images/blank.png"}
                      onClick={() => makeMove(6)}/>
-                    <TicTacToeImage src={gameState.board[7] ? `/images/${gameState.board[7]}.png` : "/images/blank.png"}
+                    <TicTacToeImage src={gameState.board[7] !== null ? `/images/${gameState.board[7]}.png` : "/images/blank.png"}
                      onClick={() => makeMove(7)}/>
+                    <TicTacToeImage src={gameState.board[8] !== null ? `/images/${gameState.board[8]}.png` : "/images/blank.png"}
+                     onClick={() => makeMove(8)}/>
                 </TicTacToeRow> 
             </TicTacToeTable>
             {!spectatorMode && <GameButtons>

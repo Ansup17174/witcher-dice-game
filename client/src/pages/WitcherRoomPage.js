@@ -1,18 +1,17 @@
 import {useState, useEffect, useReducer, useRef} from 'react';
 import useGlobalContext from '../GlobalContext';
 import {GameContainer, GameButtons, GameDices, GameSpace, DiceImage, GameText} from '../components/game';
-import {useParams, useHistory} from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
 import {Container} from '../components/containers';
 import SmallButton from '../components/SmallButton';
 import Header from '../components/Header';
 
-const RoomPage = () => {
+const WitcherRoomPage = ({roomId}) => {
 
     const patterns = [
         "Nothing", "Para", "Dwie pary", "Trojka", "Maly St", "Duzy St", "Full", "Kareta", "Poker"
     ];
     const history = useHistory();
-    const {roomId} = useParams();
     const [gameState, setGameState] = useState({
         players: [],
         score: [0, 0],
@@ -179,4 +178,4 @@ const RoomPage = () => {
     );
 };
 
-export default RoomPage;
+export default WitcherRoomPage;

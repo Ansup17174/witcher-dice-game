@@ -1,10 +1,7 @@
 from fastapi.websockets import WebSocket
-from websockets.exceptions import ConnectionClosed
-from fastapi import HTTPException
 from .general import RoomListManager
 from ..services import user_service
 from ..database import SessionLocal
-from ..models import UserModel
 from ..schemas.game import WitcherGameSchema
 from ..utils import look_for_patterns, compare_dices
 from .base_game import BaseRoomManager
@@ -12,11 +9,12 @@ from sqlalchemy.orm import Session
 import random
 
 
-class WitcherRoomManager:
+class WitcherRoomManager(BaseRoomManager):
+
+    game_name = "Witcher-dice"
+
     def __init__(self, room_id: str):
-        self.room_id: str = room_id
-        self.spectator_list: list[WebSocket] = []
-        self.connection_list: list[list[WebSocket, UserModel]] = []
+        super().__init__(room_id=room_id)
         self.game_state: WitcherGameSchema = WitcherGameSchema(**{
             "players": [],
             "score": [0, 0],
@@ -32,41 +30,6 @@ class WitcherRoomManager:
             "ready": [False, False],
             "max_players": 2
         })
-
-    async def authorize(self, ws: WebSocket, access_token: str, db: Session = SessionLocal()):
-        try:
-            user = user_service.authenticate_user(token=access_token, db=db)
-            if user.username in self.game_state.players:
-                self.connection_list.append([ws, user])
-            elif len(self.game_state.players) < self.game_state.max_players:
-                self.game_state.players.append(user.username)
-                self.connection_list.append([ws, user])
-                await RoomListManager.send_to_all()
-            else:
-                self.spectator_list.append(ws)
-        except HTTPException:
-            await ws.send_text("Invalid token")
-            self.spectator_list.append(ws)
-        finally:
-            await self.send_game_state()
-            db.close()
-
-    async def disconnect(self, ws: WebSocket):
-        for connection in self.connection_list:
-            if connection[0] is ws:
-                self.connection_list.remove(connection)
-
-    async def send_game_state(self):
-        for connection in self.connection_list:
-            try:
-                await connection[0].send_json(self.game_state.dict())
-            except ConnectionClosed:
-                pass
-        for spectator in self.spectator_list:
-            try:
-                await spectator.send_json(self.game_state.dict())
-            except ConnectionClosed:
-                pass
 
     async def roll_dices(self, player_index: int = None, chosen_dices: list[int] = None):
         if chosen_dices is None:
@@ -104,14 +67,14 @@ class WitcherRoomManager:
         winner_stats = user_service.get_user_stats(
             db=db,
             user_id=winner_id,
-            game="Witcher dice",
+            game="Witcher-dice",
             limit=1,
             offset=0
         )[0]
         loser_stats = user_service.get_user_stats(
             db=db,
             user_id=loser_id,
-            game="Witcher dice",
+            game="Witcher-dice",
             limit=1,
             offset=0
         )[0]
@@ -125,21 +88,7 @@ class WitcherRoomManager:
         for spectator in self.spectator_list:
             await spectator.close()
         RoomListManager.room_list.remove(self)
-
-    async def get_user(self, ws: WebSocket):
-        user = None
-        for connection in self.connection_list:
-            if connection[0] is ws and connection[1]:
-                user = connection[1]
-                break
-        return user
-
-    async def claim_readiness(self, player_index: int):
-        if self.game_state.ready != [True, True]:
-            self.game_state.ready[player_index] = True
-            if self.game_state.ready == [True, True]:
-                await self.initialize_game()
-            await self.send_game_state()
+        await RoomListManager.send_to_all()
 
     async def next_round(self):
         self.game_state.turn = 1

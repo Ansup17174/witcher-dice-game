@@ -97,7 +97,11 @@ class RoomListManager:
 
     @classmethod
     async def send_to_all(cls):
-        rooms = [{"id": room.room_id, "players": len(room.game_state.players)} for room in cls.room_list]
+        rooms = [{
+            "id": room.room_id,
+            "players": len(room.game_state.players),
+            "game": room.game_name
+        } for room in cls.room_list]
         for connection in cls.connection_list:
             try:
                 await connection.send_json(rooms)
@@ -106,7 +110,11 @@ class RoomListManager:
 
     @classmethod
     async def send_to_one(cls, ws: WebSocket):
-        rooms = [{"id": room.room_id, "players": len(room.game_state.players)} for room in cls.room_list]
+        rooms = [{
+            "id": room.room_id,
+            "players": len(room.game_state.players),
+            "game": room.game_name
+        } for room in cls.room_list]
         await ws.send_json(rooms)
 
     async def create_room(self, cls):

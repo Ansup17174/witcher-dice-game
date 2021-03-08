@@ -11,7 +11,8 @@ import {GlobalContext} from './GlobalContext';
 import apiClient from './apiclient';
 import ConfirmEmail from './pages/ConfirmEmail';
 import ResendPage from './pages/ResendPage';
-import RoomPage from './pages/RoomPage';
+import RoomRedirect from './components/RoomRedirect';
+import WitcherRoomPage from './pages/WitcherRoomPage';
 import RankingPage from './pages/RankingPage';
 import Navbar from './components/Navbar';
 import 'react-notifications/lib/notifications.css';
@@ -92,7 +93,7 @@ const App = () => {
 					<Route path="/register" component={RegisterPage} exact />
 					<Route path="/profile" component={ProfilePage} exact />
 					<Route path="/ranking" component={RankingPage} exact />
-					<Route path="/room/:roomId" component={RoomPage} exact />
+					<Route path="/room/:game/:roomId" component={RoomRedirect} exact />
 					<Route path="/change-password" component={ChangePasswordPage} exact />
 					<Route path="/reset-password" component={ResetPasswordPage} exact />
 					<Route path="/resend-verification-email" component={ResendPage} exact />

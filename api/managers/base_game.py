@@ -10,13 +10,15 @@ from abc import ABC, abstractmethod
 
 
 class BaseRoomManager(ABC):
+
+    game_name = None
+
     def __init__(self, room_id: str):
-        """self.game_state has to be assigned"""
+        """self.game_state and self.game_name has to be assigned"""
         self.room_id: str = room_id
         self.spectator_list: list[WebSocket] = []
         self.connection_list: list[list[WebSocket, UserModel]] = []
         self.game_state = None
-        self.game_name = None
 
     async def authorize(self, ws: WebSocket, access_token: str):
         try:
@@ -52,15 +54,6 @@ class BaseRoomManager(ABC):
             except ConnectionClosed:
                 pass
 
-    @abstractmethod
-    async def initialize_game(self):
-        """Must be implemented"""
-        raise NotImplementedError("function initialize_game has to be implemented")
-
-    @abstractmethod
-    async def finish_game(self, db: Session = SessionLocal()):
-        raise NotImplementedError("function finish_game has to be implemented")
-
     async def get_user(self, ws: WebSocket):
         user = None
         for connection in self.connection_list:
@@ -78,4 +71,16 @@ class BaseRoomManager(ABC):
 
     @abstractmethod
     async def dispatch(self, data: dict, ws: WebSocket):
-        raise NotImplementedError("function dispatch has to be implemented")
+        pass
+
+    @abstractmethod
+    async def initialize_game(self):
+        pass
+
+    @abstractmethod
+    async def next_round(self):
+        pass
+
+    @abstractmethod
+    async def finish_game(self, db: Session = SessionLocal()):
+        pass

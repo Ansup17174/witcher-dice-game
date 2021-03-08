@@ -109,7 +109,8 @@ const MainPage = () => {
                 {roomList.map((room, index) => (
                 <Row key={index}><span>Room #{room.id}</span>
                 <span>Players: {room.players}</span>
-                <WhiteLink to={`/room/${room.id}`}><SmallButton type="submit" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)" value="Join" /></WhiteLink>
+                <span>{room.game}</span>
+                <WhiteLink to={`/room/${room.game}/${room.id}`}><SmallButton type="submit" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)" value="Join" /></WhiteLink>
                 </Row>
                 ))}
             </Container>

@@ -1,6 +1,6 @@
 import {useState, useEffect, useReducer, useRef} from 'react';
 import useGlobalContext from '../GlobalContext';
-import {GameContainer, GameButtons, GameDices, GameSpace, DiceImage, GameText} from '../components/game';
+import {GameContainer, GameButtons, GameDices, GameSpace, DiceImage, GameText} from '../components/games';
 import {useHistory} from 'react-router-dom';
 import {Container} from '../components/containers';
 import SmallButton from '../components/SmallButton';

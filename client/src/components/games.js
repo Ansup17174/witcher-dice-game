@@ -81,3 +81,33 @@ export const DiceImage = styled.img`
         background-color: rgb(180, 180, 180);
     }
 `;
+
+export const TicTacToeTable = styled.table`
+    width: 100%;
+    height: 200px;
+    border: none;
+`;
+
+export const TicTacToeRow = styled.tr`
+    border: 2px solid gray !important;
+`;
+
+export const TicTacToeImage = styled.img`
+    width: 80px;
+    height: 80px;
+    border: 2px solid gray;
+    padding: 10px;
+    margin: 5px;
+    transition: 0.1s linear;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgb(180, 180, 180);
+    }
+`;
+
+export const SmallTicTacToeImage = styled.img`
+    width: 20px;
+    height: 20px;
+    margin: 0 10px;
+`;

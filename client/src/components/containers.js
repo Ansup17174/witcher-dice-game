@@ -25,3 +25,10 @@ export const Row = styled.div`
     font-size: 25px;
     margin: 10px 0;
 `;
+
+export const ImagesRow = styled.div`
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+`;

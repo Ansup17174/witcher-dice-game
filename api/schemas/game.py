@@ -25,4 +25,5 @@ class TicTacToeGameSchema(BaseModel):
     is_finished: bool
     winner: Optional[int] = None
     ready: list[bool]
+    round_result: Optional[int] = None
 

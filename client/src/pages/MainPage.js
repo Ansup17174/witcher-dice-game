@@ -6,7 +6,7 @@ import WhiteLink from '../components/WhiteLink';
 import RankingSelect from '../components/ranking/RankingSelect';
 import {Container, ColumnContainer, Row} from '../components/containers';
 import Header from '../components/Header';
-import {ChatArea, ChatInput, ChatSubmit} from '../components/game';
+import {ChatArea, ChatInput, ChatSubmit} from '../components/games';
 import apiClient from '../apiclient';
 
 const MainPage = () => {

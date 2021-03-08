@@ -1,5 +1,6 @@
 import {useParams} from 'react-router-dom';
 import WitcherRoomPage from '../pages/WitcherRoomPage';
+import TicTacToeRoomPage from '../pages/TicTacToeRoomPage';
 import NotFound from '../pages/NotFound';
 
 const RoomRedirect = () => {
@@ -8,6 +9,8 @@ const RoomRedirect = () => {
     switch (game) {
         case "Witcher-dice":
             return <WitcherRoomPage roomId={roomId}/>
+        case "Tic-tac-toe":
+            return <TicTacToeRoomPage roomId={roomId}/>
         default:
             return <NotFound />
     }

@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.websockets import WebSocket, WebSocketDisconnect
-from ..weboscket_managers.general import OnlineUsersManager, PublicChatManager, RoomListManager
-from ..weboscket_managers.witcher import WitcherRoomManager
+from ..websocket_managers.general import OnlineUsersManager, PublicChatManager, RoomListManager
+from ..websocket_managers.witcher import WitcherRoomManager
+from ..websocket_managers.tictactoe import TicTacToeManager
 from ..services import user_service
 from ..models import UserModel
 from ..schemas.users import UserStatsSchema
@@ -40,7 +41,8 @@ def get_ranking(
 @game_router.post("/create-room")
 async def create_room(room_type: str, user: UserModel = Depends(user_service.authenticate_user)):
     room_types = {
-        "Witcher-dice": WitcherRoomManager
+        "Witcher-dice": WitcherRoomManager,
+        "Tic-tac-toe": TicTacToeManager
     }
     if room_type not in room_types.keys():
         raise HTTPException(detail="Invalid room type", status_code=400)

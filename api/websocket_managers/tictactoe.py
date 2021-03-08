@@ -69,9 +69,9 @@ class TicTacToeManager(BaseRoomManager):
         if not self.game_state.ready[0] and not self.game_state.ready[1]:
             await self.send_game_state()
             return
-        if action == "move" and (field := data.get('field')):
-            if self.game_state.board[field] is not None:
-                self.game_state.board[field] = player_index
+        if action == "move" and (index := data.get('index')):
+            if self.game_state.board[index] is not None:
+                self.game_state.board[index] = player_index
                 await self.check_board()
 
     async def initialize_game(self):

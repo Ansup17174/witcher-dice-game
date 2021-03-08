@@ -12,9 +12,11 @@ from abc import ABC, abstractmethod
 class BaseRoomManager(ABC):
 
     game_name = None
+    max_players = None
 
+    @abstractmethod
     def __init__(self, room_id: str):
-        """self.game_state and self.game_name has to be assigned"""
+        """self.game_state, max_players and game_name has to be assigned"""
         self.room_id: str = room_id
         self.spectator_list: list[WebSocket] = []
         self.connection_list: list[list[WebSocket, UserModel]] = []
@@ -25,7 +27,7 @@ class BaseRoomManager(ABC):
             user = user_service.authenticate_user(token=access_token, db=SessionLocal())
             if user.username in self.game_state.players:
                 self.connection_list.append([ws, user])
-            elif len(self.game_state.players) < self.game_state.max_players:
+            elif len(self.game_state.players) < self.max_players:
                 self.game_state.players.append(user.username)
                 self.connection_list.append([ws, user])
                 await RoomListManager.send_to_all()
@@ -63,9 +65,9 @@ class BaseRoomManager(ABC):
         return user
 
     async def claim_readiness(self, player_index: int):
-        if self.game_state.ready != [True] * self.game_state.max_players:
+        if self.game_state.ready != [True] * self.max_players:
             self.game_state.ready[player_index] = True
-            if self.game_state.ready == [True] * self.game_state.max_players:
+            if self.game_state.ready == [True] * self.max_players:
                 await self.initialize_game()
             await self.send_game_state()
 

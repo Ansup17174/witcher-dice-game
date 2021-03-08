@@ -14,7 +14,6 @@ class WitcherGameSchema(BaseModel):
     winner: Optional[int] = None
     ready: list[bool]
     deal_result: Optional[int] = None
-    max_players: int
 
 
 class TicTacToeGameSchema(BaseModel):
@@ -26,4 +25,4 @@ class TicTacToeGameSchema(BaseModel):
     is_finished: bool
     winner: Optional[int] = None
     ready: list[bool]
-    max_players: int
+

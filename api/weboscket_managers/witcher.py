@@ -12,6 +12,7 @@ import random
 class WitcherRoomManager(BaseRoomManager):
 
     game_name = "Witcher-dice"
+    max_players = 2
 
     def __init__(self, room_id: str):
         super().__init__(room_id=room_id)
@@ -28,7 +29,6 @@ class WitcherRoomManager(BaseRoomManager):
             "deal": 1,
             "is_finished": False,
             "ready": [False, False],
-            "max_players": 2
         })
 
     async def roll_dices(self, player_index: int = None, chosen_dices: list[int] = None):
@@ -113,8 +113,11 @@ class WitcherRoomManager(BaseRoomManager):
                 self.game_state.deal_result = -1
 
     async def dispatch(self, data: dict, ws: WebSocket):
-        actions = ['roll', 'pass', 'surrender', 'tie', 'ready', 'authorize']
+        actions = ['roll', 'pass', 'ready', 'authorize']
         action = data.get('action')
+        if action not in actions:
+            await self.send_game_state()
+            return
         if self.game_state.is_finished:
             return
         if action == 'authorize' and data.get('access_token'):
@@ -125,9 +128,6 @@ class WitcherRoomManager(BaseRoomManager):
             await self.send_game_state()
             return
         player_index = self.game_state.players.index(user.username)
-        if action not in actions:
-            await self.send_game_state()
-            return
         if action == 'ready':
             await self.claim_readiness(player_index)
             return

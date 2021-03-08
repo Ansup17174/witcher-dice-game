@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.websockets import WebSocket, WebSocketDisconnect
-from ..managers.general import OnlineUsersManager, PublicChatManager, RoomListManager
-from ..managers.witcher import WitcherRoomManager
+from ..weboscket_managers.general import OnlineUsersManager, PublicChatManager, RoomListManager
+from ..weboscket_managers.witcher import WitcherRoomManager
 from ..services import user_service
 from ..models import UserModel
 from ..schemas.users import UserStatsSchema

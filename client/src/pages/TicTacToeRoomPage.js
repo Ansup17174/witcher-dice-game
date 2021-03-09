@@ -113,7 +113,8 @@ const TicTacToeRoomPage = ({roomId}) => {
                      onClick={() => makeMove(8)}/>
                 </TicTacToeRow> 
             </TicTacToeTable>
-            {!spectatorMode && <GameButtons>
+            {gameState.timeout !== null && <GameText>Time left: {gameState.timeout}s</GameText>}
+            {!spectatorMode && gameState.players.length === 2 && <GameButtons>
                 {!gameState.ready[yourIndex] && gameState.score[0] !== 2 && gameState.score[1] !== 2 &&
                 <SmallButton type="submit" value="Ready" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)"
                 onClick={() => sendReady()}/>}

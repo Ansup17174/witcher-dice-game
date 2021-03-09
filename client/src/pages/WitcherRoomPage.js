@@ -161,6 +161,7 @@ const WitcherRoomPage = ({roomId}) => {
             </GameContainer>
             {!spectatorMode && <GameButtons>
                 {!gameState.ready[yourIndex] && gameState.score[0] !== 2 && gameState.score[1] !== 2 &&
+                gameState.players.length === 2 && 
                 <SmallButton type="submit" value="Ready" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)"
                 onClick={() => sendReady()}/>}
                 {gameState.ready[0]

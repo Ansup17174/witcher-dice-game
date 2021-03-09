@@ -20,7 +20,8 @@ const TicTacToeRoomPage = ({roomId}) => {
         is_finished: false,
         ready: [false, false],
         winner: null,
-        round_result: null
+        round_result: null,
+        timeout: null
     });
 
     const {userData, NotificationManager, webSocketBase} = useGlobalContext();
@@ -118,7 +119,7 @@ const TicTacToeRoomPage = ({roomId}) => {
                 onClick={() => sendReady()}/>}
                 {gameState.is_finished && <GameText>Game finished</GameText>}
             </GameButtons>}
-            <FormLink to="/">Go to main page</FormLink>
+            {gameState.is_finished && <FormLink to="/">Go to main page</FormLink>}
         </Container>
     );
 };

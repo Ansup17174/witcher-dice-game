@@ -25,7 +25,8 @@ const WitcherRoomPage = ({roomId}) => {
         deal: 1,
         is_finished: false,
         ready: [false, false],
-        winner: null
+        winner: null,
+        timeout: null
     });
 
     const {userData, NotificationManager, webSocketBase} = useGlobalContext();

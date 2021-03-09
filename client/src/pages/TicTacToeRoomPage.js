@@ -15,7 +15,7 @@ const TicTacToeRoomPage = ({roomId}) => {
         players: [],
         score: [0, 0],
         board: Array(9).fill(null),
-        current_player: 0,
+        current_player: null,
         round: 1,
         is_finished: false,
         ready: [false, false],
@@ -79,13 +79,14 @@ const TicTacToeRoomPage = ({roomId}) => {
                     (!gameState.ready[0] || !gameState.ready[1]) &&
                     <Header>{gameState.players[gameState.round_result]} gets the point</Header>}
                 {gameState.winner && <Header>{gameState.winner} wins</Header>}
-                {!gameState.is_finished && gameState.round_result === -1 && <Header>It's a tie!</Header>}
+                {gameState.round_result === -1 && <Header>It's a tie!</Header>}
                 {gameState.players[0] && (!gameState.ready[0] || !gameState.ready[1]) && !gameState.is_finished &&
                     <GameText>{gameState.ready[0] ? `${gameState.players[0]} ready` : `${gameState.players[0]} not ready`}</GameText>
                 }
                 {gameState.players[1] && (!gameState.ready[0] || !gameState.ready[1]) && !gameState.is_finished &&
                     <GameText>{gameState.ready[1] ? `${gameState.players[1]} ready` : `${gameState.players[1]} not ready`}</GameText>
                 }
+                {gameState.is_finished && <Header>Game finished</Header>}
             </GameSpace>
             <TicTacToeTable>
                 <TicTacToeRow>
@@ -115,10 +116,9 @@ const TicTacToeRoomPage = ({roomId}) => {
             </TicTacToeTable>
             {gameState.timeout !== null && <GameText>Time left: {gameState.timeout}s</GameText>}
             {!spectatorMode && gameState.players.length === 2 && <GameButtons>
-                {!gameState.ready[yourIndex] && gameState.score[0] !== 2 && gameState.score[1] !== 2 &&
+                {!gameState.is_finished && !gameState.ready[yourIndex] && gameState.score[0] !== 2 && gameState.score[1] !== 2 &&
                 <SmallButton type="submit" value="Ready" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)"
                 onClick={() => sendReady()}/>}
-                {gameState.is_finished && <GameText>Game finished</GameText>}
             </GameButtons>}
             {gameState.is_finished && <FormLink to="/">Go to main page</FormLink>}
         </Container>

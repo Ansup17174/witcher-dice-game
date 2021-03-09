@@ -20,7 +20,8 @@ const WitcherRoomPage = ({roomId}) => {
             [6, 6, 6, 6, 6]
         ],
         dices_value: [0, 0],
-        current_player: 0,
+        current_player: null,
+        round_result: null,
         turn: 1,
         deal: 1,
         is_finished: false,
@@ -135,13 +136,16 @@ const WitcherRoomPage = ({roomId}) => {
                     (!gameState.ready[0] || !gameState.ready[1]) &&
                     <Header>{gameState.players[gameState.round_result]} gets the point</Header>}
                 {gameState.winner && <GameText>{gameState.winner} wins</GameText>}
-                {!gameState.is_finished && gameState.round_result === -1 && <Header>It's a tie!</Header>}
+                {gameState.round_result === -1 && <Header>It's a tie!</Header>}
                 {gameState.players[0] && (!gameState.ready[0] || !gameState.ready[1]) && !gameState.is_finished &&
+                    gameState.players.length === 2 &&
                     <GameText>{gameState.ready[0] ? `${gameState.players[0]} ready` : `${gameState.players[0]} not ready`}</GameText>
                 }
-                {gameState.players[1] && (!gameState.ready[0] || !gameState.ready[1]) && !gameState.is_finished &&
+                {gameState.players[1] && (!gameState.ready[0] || !gameState.ready[1]) && !gameState.is_finished && 
+                    gameState.players.length === 2 &&
                     <GameText>{gameState.ready[1] ? `${gameState.players[1]} ready` : `${gameState.players[1]} not ready`}</GameText>
                 }
+                {gameState.is_finished && <Header>Game finished</Header>}
             </GameSpace>
             <GameContainer>
                 <GameDices>
@@ -159,7 +163,8 @@ const WitcherRoomPage = ({roomId}) => {
                 <GameText>{spectatorMode ? gameState.players[0] : "You"}</GameText>
                 <GameText>Pattern: {patterns[gameState.dices_value[yourIndex]]}</GameText>
             </GameContainer>
-            {!spectatorMode && <GameButtons>
+            {gameState.timeout !== null && <GameText>Time left: {gameState.timeout}s</GameText>}
+            {!spectatorMode && !gameState.is_finished &&  <GameButtons>
                 {!gameState.ready[yourIndex] && gameState.score[0] !== 2 && gameState.score[1] !== 2 &&
                 gameState.players.length === 2 && 
                 <SmallButton type="submit" value="Ready" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)"
@@ -174,7 +179,6 @@ const WitcherRoomPage = ({roomId}) => {
                 && gameState.current_player === yourIndex
                 && <SmallButton type="submit" value="Roll" color="green" hoverColor="rgb(75, 245, 66)"
                 onClick={() => sendDices()}/>}
-                {gameState.is_finished && <GameText>Game finished</GameText>}
             </GameButtons>}
         </Container>
     );

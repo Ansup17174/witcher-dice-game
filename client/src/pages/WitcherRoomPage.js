@@ -130,11 +130,11 @@ const WitcherRoomPage = ({roomId}) => {
                 </GameDices>
             </GameContainer>
             <GameSpace>
-                {!gameState.is_finished && gameState.deal_result !== -1 && gameState.deal_result !== null &&
+                {!gameState.is_finished && gameState.round_result !== -1 && gameState.round_result !== null &&
                     (!gameState.ready[0] || !gameState.ready[1]) &&
-                    <Header>{gameState.players[gameState.deal_result]} gets the point</Header>}
+                    <Header>{gameState.players[gameState.round_result]} gets the point</Header>}
                 {gameState.winner && <GameText>{gameState.winner} wins</GameText>}
-                {!gameState.is_finished && gameState.deal_result === -1 && <Header>It's a tie!</Header>}
+                {!gameState.is_finished && gameState.round_result === -1 && <Header>It's a tie!</Header>}
                 {gameState.players[0] && (!gameState.ready[0] || !gameState.ready[1]) && !gameState.is_finished &&
                     <GameText>{gameState.ready[0] ? `${gameState.players[0]} ready` : `${gameState.players[0]} not ready`}</GameText>
                 }

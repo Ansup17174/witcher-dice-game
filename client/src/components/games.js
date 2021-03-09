@@ -56,7 +56,8 @@ export const GameDices = styled.div`
 `;
 
 export const GameSpace = styled.div`
-    height: 50px;
+    min-height: 50px;
+    margin: 10px 0;
 `;
 
 export const GameContainer = styled.div`

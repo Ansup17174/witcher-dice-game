@@ -1,7 +1,8 @@
-import {useState, useEffect, useReducer, useRef} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import useGlobalContext from '../GlobalContext';
 import {GameContainer, GameButtons, GameSpace, GameText, TicTacToeImage, TicTacToeTable, TicTacToeRow,
     SmallTicTacToeImage} from '../components/games';
+import {FormLink} from '../components/forms/form';
 import {useHistory} from 'react-router-dom';
 import {Container, ImagesRow} from '../components/containers';
 import SmallButton from '../components/SmallButton';
@@ -13,11 +14,7 @@ const TicTacToeRoomPage = ({roomId}) => {
     const [gameState, setGameState] = useState({
         players: [],
         score: [0, 0],
-        board: [
-            0, 0, 0,
-            1, 1, 1,
-            0, 0, 0
-        ],
+        board: Array(9).fill(null),
         current_player: 0,
         round: 1,
         is_finished: false,
@@ -62,12 +59,13 @@ const TicTacToeRoomPage = ({roomId}) => {
         <Container>
             <GameText>Room {roomId}</GameText>
                 <GameText>Score: {`${gameState.score[0]}-${gameState.score[1]}`}</GameText>
+                {gameState.round !== 0 && <GameText>Round: {gameState.round}</GameText>}
                 <Header>
-                    {gameState.players.length === 2 ? 
+                    {!gameState.is_finished && (gameState.players.length === 2 ? 
                     (gameState.ready[0] && gameState.ready[1] ? 
                     (spectatorMode ? `${gameState.players[gameState.current_player]}'s turn` :
                         (gameState.players[gameState.current_player] === userData.username ? "Your turn" : "Opponent's turn")) : null)
-                     : "Waiting for an opponent"}
+                     : "Waiting for an opponent")}
                 </Header>
             <GameContainer>
                 <ImagesRow>
@@ -79,7 +77,7 @@ const TicTacToeRoomPage = ({roomId}) => {
                 {!gameState.is_finished && gameState.round_result !== -1 && gameState.round_result !== null &&
                     (!gameState.ready[0] || !gameState.ready[1]) &&
                     <Header>{gameState.players[gameState.round_result]} gets the point</Header>}
-                {gameState.winner && <GameText>{gameState.winner} wins</GameText>}
+                {gameState.winner && <Header>{gameState.winner} wins</Header>}
                 {!gameState.is_finished && gameState.round_result === -1 && <Header>It's a tie!</Header>}
                 {gameState.players[0] && (!gameState.ready[0] || !gameState.ready[1]) && !gameState.is_finished &&
                     <GameText>{gameState.ready[0] ? `${gameState.players[0]} ready` : `${gameState.players[0]} not ready`}</GameText>
@@ -118,7 +116,9 @@ const TicTacToeRoomPage = ({roomId}) => {
                 {!gameState.ready[yourIndex] && gameState.score[0] !== 2 && gameState.score[1] !== 2 &&
                 <SmallButton type="submit" value="Ready" color="rgb(20, 149, 168)" hoverColor="rgb(31, 211, 237)"
                 onClick={() => sendReady()}/>}
+                {gameState.is_finished && <GameText>Game finished</GameText>}
             </GameButtons>}
+            <FormLink to="/">Go to main page</FormLink>
         </Container>
     );
 };

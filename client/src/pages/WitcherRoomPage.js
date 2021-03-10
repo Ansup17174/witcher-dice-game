@@ -2,6 +2,7 @@ import {useState, useEffect, useReducer, useRef} from 'react';
 import useGlobalContext from '../GlobalContext';
 import {GameContainer, GameButtons, GameDices, GameSpace, DiceImage, GameText} from '../components/games';
 import {useHistory} from 'react-router-dom';
+import {FormLink} from '../components/forms/form';
 import {Container} from '../components/containers';
 import SmallButton from '../components/SmallButton';
 import Header from '../components/Header';
@@ -37,7 +38,8 @@ const WitcherRoomPage = ({roomId}) => {
     const roomWs = useRef(null);
 
     const reducer = (state, action) => {
-        if (!gameState.ready[0] || !gameState.ready[1] || gameState.current_player !== yourIndex || spectatorMode) {
+        if (!gameState.ready[0] || !gameState.ready[1] || gameState.current_player !== yourIndex
+             || spectatorMode || !gameState.is_finished) {
             return state;
         }
         switch (action.type) {
@@ -77,6 +79,7 @@ const WitcherRoomPage = ({roomId}) => {
             action: 'ready'
         };
         roomWs.current.send(JSON.stringify(data));
+        dispatch({type: "reset"});
     };
 
     const sendPass = async () => {
@@ -84,6 +87,7 @@ const WitcherRoomPage = ({roomId}) => {
             action: 'pass'
         };
         roomWs.current.send(JSON.stringify(data));
+        dispatch({type: "reset"});
     };
 
     const sendDices = async () => {
@@ -180,6 +184,7 @@ const WitcherRoomPage = ({roomId}) => {
                 && <SmallButton type="submit" value="Roll" color="green" hoverColor="rgb(75, 245, 66)"
                 onClick={() => sendDices()}/>}
             </GameButtons>}
+            {gameState.is_finished && <FormLink to="/">Go to main page</FormLink>}
         </Container>
     );
 };

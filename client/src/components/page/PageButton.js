@@ -12,10 +12,13 @@ const PageButton = styled.div`
     font-weight: bold;
     font-size: 20px;
     cursor: pointer;
-    
 
     &:hover {
         background-color: rgb(75, 245, 66);
+    }
+
+    @media only screen and (max-width: 768px) {
+        margin: 0 10px;
     }
 `;
 

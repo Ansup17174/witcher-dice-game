@@ -16,6 +16,7 @@ let RankingRow = ({stats, className}) => {
 RankingRow = styled(RankingRow)`
     height: 50px;
     border: 2px solid white;
+    
 `;
 
 export default RankingRow;

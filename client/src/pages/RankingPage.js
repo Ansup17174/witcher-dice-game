@@ -64,5 +64,5 @@ const RankingPage = () => {
         </Container>
     );
 };
-
+    
 export default RankingPage;

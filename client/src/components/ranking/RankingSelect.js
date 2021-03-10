@@ -10,6 +10,11 @@ const RankingSelect = styled.select`
     border: none;
     font-size: 20px;
     padding: 0 20px;
+
+    @media only screen and (max-width: 768px) {
+        width: 140px;
+        font-size: 15px;
+    }
 `;
 
 export default RankingSelect;

@@ -5,6 +5,7 @@ const Button = styled.input`
     background-color: ${props => props.color};
     padding: 20px 60px;
     margin: 20px 0;
+    font-weight: bold;
     font-size: 20px;
     outline: none;
     border: none;
@@ -13,6 +14,11 @@ const Button = styled.input`
 
     &:hover {
         background-color: ${props => props.hoverColor};
+    }
+
+    @media only screen and (max-width: 768px) {
+        font-size: 15px;
+        padding: 10px 30px;
     }
 `;
 

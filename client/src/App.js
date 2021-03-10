@@ -1,5 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
+import {MainContainer} from './components/containers';
 import MainPage from './pages/MainPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
@@ -12,7 +13,6 @@ import apiClient from './apiclient';
 import ConfirmEmail from './pages/ConfirmEmail';
 import ResendPage from './pages/ResendPage';
 import RoomRedirect from './components/RoomRedirect';
-import WitcherRoomPage from './pages/WitcherRoomPage';
 import RankingPage from './pages/RankingPage';
 import Navbar from './components/Navbar';
 import 'react-notifications/lib/notifications.css';
@@ -23,6 +23,10 @@ import LoadingPage from './pages/LoadingPage';
 const App = () => {
 
 	const [loading, setLoading] = useState(true);
+	const [navbarDropdown, setNavbarDropdown] = useState(false);
+	document.body.style.overflowY = navbarDropdown && window.innerWidth <= 768 ? ("hidden", console.log("xd")) : "auto";
+
+
 	const webSocketBase = "ws://localhost:8000/ws";
 	const [onlineUsers, setOnlineUsers] = useState([]);
 	const [userData, setUserData] = useState({
@@ -85,8 +89,8 @@ const App = () => {
 		<GlobalContext.Provider value={{userData, setUserData, getUserData, NotificationManager, webSocketBase, onlineUsers}}>
 			<LoadingPage loading={loading}>Loading...</LoadingPage>
 			<Router>
-				<Navbar />
-				<div className="main-page">
+				<Navbar navbarDropdown={navbarDropdown} setNavbarDropdown={setNavbarDropdown}/>
+				<MainContainer>
 				<NotificationContainer />
 				<Switch>
 					<Route path="/" component={userData.id ? MainPage : LoginPage} exact />
@@ -100,7 +104,7 @@ const App = () => {
 					<Route path="/confirm-email/:user_id/:token" component={ConfirmEmail} exact />
 					<Route path="*" component={NotFound} exact />
 				</Switch>
-				</div>
+				</MainContainer>
 			</Router>
 		</GlobalContext.Provider>
 	);

@@ -20,6 +20,10 @@ export const ChatInput = styled.input`
     border: none;
     color: white;
     margin: 5px 20px 5px 0;
+
+    @media only screen and (max-width: 1450px) {
+        margin: 5px 0;
+    }
 `;
 
 export const ChatSubmit = styled.div`
@@ -29,6 +33,7 @@ export const ChatSubmit = styled.div`
     background-color: green;
     height: 40px;
     padding: 0 20px;
+    margin: 20px 0;
     font-size: 20px;
     cursor: pointer;
     transition: linear 0.25s;
@@ -81,6 +86,11 @@ export const DiceImage = styled.img`
     &:hover {
         background-color: rgb(180, 180, 180);
     }
+
+    @media only screen and (max-width: 768px) {
+        width: 50px;
+        height: 50px;
+    }
 `;
 
 export const TicTacToeTable = styled.table`
@@ -104,6 +114,12 @@ export const TicTacToeImage = styled.img`
 
     &:hover {
         background-color: rgb(180, 180, 180);
+    }
+
+    @media only screen and (max-width: 768px) {
+        width: 45px;
+        height: 45px;
+        padding: 5px;
     }
 `;
 

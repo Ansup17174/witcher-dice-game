@@ -6,6 +6,7 @@ const RankingTable = styled.table`
     width: 100%;
     border: 2px solid white;
     border-collapse: collapse;
+
 `;
 
 export default RankingTable;

@@ -20,10 +20,6 @@ const ProfilePage = () => {
         setUserProfile(userData);
     }, [])
 
-    // const calculateWinRatio = number => {
-    //     return Math.round(number * 100) + '%';
-    // };
-
     return (
         <Container>
             <Header>Profile</Header>

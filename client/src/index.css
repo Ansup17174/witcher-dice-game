@@ -17,13 +17,6 @@ input:-webkit-autofill {
   -webkit-text-fill-color: white;
 }
 
-.main-page {
-  display: flex;
-  justify-content: center;
-  min-height: calc(100vh - 70px);
-  align-items: center;
-}
-
 ::-webkit-scrollbar {
   width: 7px;
   background: transparent;

@@ -103,6 +103,7 @@ const MainPage = () => {
                     <option defaultValue disabled>-</option>
                     <option>Witcher-dice</option>
                     <option>Tic-tac-toe</option>
+                    <option>Black-queen</option>
                 </RankingSelect> 
                 </div>
                 <Button type="submit" value="Create room " onClick={() => createRoom(select)} color="green" hoverColor="rgb(75, 245, 66)"/>

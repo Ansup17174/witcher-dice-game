@@ -45,6 +45,7 @@ const RankingPage = () => {
                 <option disabled defaultValue>-</option>
                 <option>Witcher-dice</option>
                 <option>Tic-tac-toe</option>
+                <option>Black-queen</option>
             </RankingSelect>
             <RankingTable>
                 <RankingHeader>

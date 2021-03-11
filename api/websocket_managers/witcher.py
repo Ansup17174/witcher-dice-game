@@ -24,7 +24,7 @@ class WitcherRoomManager(BaseRoomManager):
                 [6, 6, 6, 6, 6]
             ],
             "dices_value": [0, 0],
-            "current_player": 0,
+            "current_player": None,
             "turn": 1,
             "deal": 1,
             "is_finished": False,
@@ -96,10 +96,10 @@ class WitcherRoomManager(BaseRoomManager):
         self.game_state.ready = [False, False]
         if self.game_state.dices_value[0] > self.game_state.dices_value[1]:
             self.game_state.score[0] += 1
-            self.game_state.deal_result = 0
+            self.game_state.round_result = 0
         elif self.game_state.dices_value[0] < self.game_state.dices_value[1]:
             self.game_state.score[1] += 1
-            self.game_state.deal_result = 1
+            self.game_state.round_result = 1
         else:
             winning_index = compare_dices(
                 self.game_state.dices[0],
@@ -108,9 +108,36 @@ class WitcherRoomManager(BaseRoomManager):
             )
             if winning_index >= 0:
                 self.game_state.score[winning_index] += 1
-                self.game_state.deal_result = winning_index
+                self.game_state.round_result = winning_index
             else:
-                self.game_state.deal_result = -1
+                self.game_state.round_result = -1
+
+    async def timed_out(self):
+        self.game_state.is_finished = True
+        if self.game_state.current_player is None:
+            score1, score2 = self.game_state.score
+            if score1 == score2 == 0:
+                self.game_state.round_result = -1
+                RoomListManager.room_list.remove(self)
+                await RoomListManager.send_to_all()
+                await self.send_game_state()
+                await self.disconnect_all()
+            elif score1 == score2:
+                ready1, ready2 = self.game_state.ready
+                if ready1 == ready2:
+                    self.game_state.round_result = -1
+                    RoomListManager.room_list.remove(self)
+                    await RoomListManager.send_to_all()
+                    await self.send_game_state()
+                    await self.disconnect_all()
+                else:
+                    self.game_state.score = [2, 0] if ready1 else [0, 2]
+                    await self.finish_game()
+            else:
+                await self.finish_game()
+        else:
+            self.game_state.score = [2, 0] if self.game_state.current_player else [0, 2]
+            await self.finish_game()
 
     async def dispatch(self, data: dict, ws: WebSocket):
         actions = ['roll', 'pass', 'ready', 'authorize']

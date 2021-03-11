@@ -3,6 +3,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 from ..websocket_managers.general import OnlineUsersManager, PublicChatManager, RoomListManager
 from ..websocket_managers.witcher import WitcherRoomManager
 from ..websocket_managers.tictactoe import TicTacToeManager
+from ..websocket_managers.black_queen import BlackQueenManager
 from ..services import user_service
 from ..models import UserModel
 from ..schemas.users import UserStatsSchema
@@ -42,7 +43,8 @@ def get_ranking(
 async def create_room(room_type: str, user: UserModel = Depends(user_service.authenticate_user)):
     room_types = {
         "Witcher-dice": WitcherRoomManager,
-        "Tic-tac-toe": TicTacToeManager
+        "Tic-tac-toe": TicTacToeManager,
+        "Black-queen": BlackQueenManager
     }
     if room_type not in room_types.keys():
         raise HTTPException(detail="Invalid room type", status_code=400)
@@ -97,7 +99,7 @@ async def room_websocket(ws: WebSocket, room_id: str):
             selected_room = room
             break
     if selected_room is None:
-        raise WebSocketDisconnect
+        return
     await ws.accept()
     try:
         while True:

@@ -117,18 +117,21 @@ class RoomListManager:
         } for room in cls.room_list]
         await ws.send_json(rooms)
 
-    async def create_room(self, cls):
-        room_manager = cls(str(uuid4()))
-        self.room_list.append(room_manager)
-        await self.send_to_all()
+    @classmethod
+    async def create_room(cls, room):
+        room_manager = room(str(uuid4()))
+        cls.room_list.append(room_manager)
+        await cls.send_to_all()
 
-    async def remove_room(self, room_id: str):
-        for room_manager in self.room_list:
+    @classmethod
+    async def remove_room(cls, room_id: str):
+        for room_manager in cls.room_list:
             if room_manager.room_id == room_id:
-                self.room_list.remove(room_manager)
+                cls.room_list.remove(room_manager)
                 del room_manager
                 break
-        await self.send_to_all()
+        await cls.send_to_all()
 
-    async def disconnect(self, ws: WebSocket):
-        self.connection_list.remove(ws)
+    @classmethod
+    async def disconnect(cls, ws: WebSocket):
+        cls.connection_list.remove(ws)

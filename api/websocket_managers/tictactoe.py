@@ -18,8 +18,8 @@ class TicTacToeManager(BaseRoomManager):
             players=[],
             score=[0, 0],
             board=[None]*9,
-            current_player=0,
-            round=1,
+            current_player=None,
+            round=0,
             is_finished=False,
             ready=[False]*self.max_players
         )
@@ -32,6 +32,7 @@ class TicTacToeManager(BaseRoomManager):
                 if round_winner is None:
                     return
                 self.game_state.score[round_winner] += 1
+                self.game_state.round_result = round_winner
                 await self.next_round()
                 return
         for column in range(3):
@@ -40,6 +41,7 @@ class TicTacToeManager(BaseRoomManager):
                 if round_winner is None:
                     return
                 self.game_state.score[round_winner] += 1
+                self.game_state.round_result = round_winner
                 await self.next_round()
                 return
         if board[0] == board[4] == board[8] or board[2] == board[4] == board[6]:
@@ -47,13 +49,21 @@ class TicTacToeManager(BaseRoomManager):
             if round_winner is None:
                 return
             self.game_state.score[round_winner] += 1
+            self.game_state.round_result = round_winner
             await self.next_round()
             return
+        full = True
+        for field in self.game_state.board:
+            if field is None:
+                full = False
+                break
+        if full:
+            self.game_state.round_result = -1
+            await self.next_round()
 
     async def dispatch(self, data: dict, ws: WebSocket):
         actions = ("ready", "authorize", "move")
         action = data.get('action')
-        print(data)
         if action not in actions:
             await self.send_game_state()
             return
@@ -76,14 +86,12 @@ class TicTacToeManager(BaseRoomManager):
         if not self.game_state.ready[0] and not self.game_state.ready[1]:
             await self.send_game_state()
             return
-        print("before move")
         if action == "move" and data.get('index') is not None:
             index = data['index']
             if self.game_state.board[index] is None:
-                print(index)
                 self.game_state.board[index] = player_index
+                await self.timer.reset()
                 await self.check_board()
-                print(self.game_state)
                 self.game_state.current_player = 0 if self.game_state.current_player else 1
                 await self.send_game_state()
 
@@ -96,9 +104,36 @@ class TicTacToeManager(BaseRoomManager):
         if self.game_state.score[0] == 2 or self.game_state.score[1] == 2:
             await self.finish_game()
         else:
-            await self.initialize_game()
             self.game_state.ready = [False] * self.max_players
-            self.game_state.round += 1
+            self.game_state.current_player = None
+            await self.send_game_state()
+
+    async def timed_out(self):
+        self.game_state.is_finished = True
+        if self.game_state.current_player is None:
+            score1, score2 = self.game_state.score
+            if score1 == score2 == 0:
+                self.game_state.round_result = -1
+                await self.send_game_state()
+                RoomListManager.room_list.remove(self)
+                await RoomListManager.send_to_all()
+                await self.disconnect_all()
+            elif score1 == score2:
+                ready1, ready2 = self.game_state.ready
+                if ready1 == ready2:
+                    self.game_state.round_result = -1
+                    await self.send_game_state()
+                    RoomListManager.room_list.remove(self)
+                    await RoomListManager.send_to_all()
+                    await self.disconnect_all()
+                else:
+                    self.game_state.score = [2, 0] if ready1 else [0, 2]
+                    await self.finish_game()
+            else:
+                await self.finish_game()
+        else:
+            self.game_state.score = [2, 0] if self.game_state.current_player else [0, 2]
+            await self.finish_game()
 
     async def finish_game(self, db: Session = SessionLocal()):
         self.game_state.is_finished = True
@@ -133,9 +168,6 @@ class TicTacToeManager(BaseRoomManager):
         loser_stats.matches_lost += 1
         loser_stats.matches_played += 1
         db.commit()
-        for connection in self.connection_list:
-            await connection[0].close()
-        for spectator in self.spectator_list:
-            await spectator.close()
+        await self.disconnect_all()
         RoomListManager.room_list.remove(self)
         await RoomListManager.send_to_all()

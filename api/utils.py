@@ -5,6 +5,7 @@ from string import Template
 from .models import UserModel
 from . import config
 import os
+import asyncio
 
 
 def get_template(filename: str):

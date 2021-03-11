@@ -13,17 +13,32 @@ class WitcherGameSchema(BaseModel):
     is_finished: bool
     winner: Optional[int] = None
     ready: list[bool]
-    deal_result: Optional[int] = None
+    round_result: Optional[int] = None
+    timeout: Optional[int] = None
 
 
 class TicTacToeGameSchema(BaseModel):
     players: list[str]
     score: list[int]
     board: list[Optional[int]]
-    current_player: int
+    current_player: Optional[int] = None
     round: int
     is_finished: bool
     winner: Optional[int] = None
     ready: list[bool]
     round_result: Optional[int] = None
+    timeout: Optional[int] = None
 
+
+class BlackQueenGameSchema(BaseModel):
+    players: list[str]
+    score: list[int]
+    ready: list[bool]
+    decks: list[dict[str, list[str]]]
+    table: list[list[str, int]]
+    current_player: Optional[int] = None
+    is_finished: bool
+    turn: int
+    deal: int
+    scoring_cards: dict[str, int]
+    timeout: Optional[int] = None

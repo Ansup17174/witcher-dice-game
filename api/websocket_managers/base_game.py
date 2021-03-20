@@ -15,6 +15,8 @@ class BaseRoomManager(ABC):
 
     game_name = None
     max_players = None
+    allow_spectators = True
+    use_timer = True
 
     @abstractmethod
     def __init__(self, room_id: str):
@@ -23,7 +25,7 @@ class BaseRoomManager(ABC):
         self.spectator_list: list[WebSocket] = []
         self.connection_list: list[list[WebSocket, UserModel]] = []
         self.game_state = None
-        self.timer: Timer = Timer(60, self)
+        self.timer = Timer(60, self) if self.use_timer else None
 
     async def authorize(self, ws: WebSocket, access_token: str):
         try:
@@ -33,14 +35,20 @@ class BaseRoomManager(ABC):
             elif len(self.game_state.players) < self.max_players:
                 self.game_state.players.append(user.username)
                 self.connection_list.append([ws, user])
-                if len(self.connection_list) == 2:
+                if len(self.connection_list) == self.max_players and self.use_timer:
                     asyncio.get_running_loop().create_task(self.timer.start())
                 await RoomListManager.send_to_all()
             else:
-                self.spectator_list.append(ws)
+                if self.allow_spectators:
+                    self.spectator_list.append(ws)
+                else:
+                    await ws.close()
         except HTTPException:
             await ws.send_text("Invalid token")
-            self.spectator_list.append(ws)
+            if self.allow_spectators:
+                self.spectator_list.append(ws)
+            else:
+                await ws.close()
         finally:
             await self.send_game_state()
 
@@ -78,7 +86,8 @@ class BaseRoomManager(ABC):
     async def claim_readiness(self, player_index: int):
         if self.game_state.ready != [True] * self.max_players and len(self.game_state.players):
             self.game_state.ready[player_index] = True
-            await self.timer.reset()
+            if self.use_timer:
+                await self.timer.reset()
             if self.game_state.ready == [True] * self.max_players:
                 self.game_state.round_result = None
                 await self.initialize_game()

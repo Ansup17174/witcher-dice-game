@@ -165,3 +165,13 @@ def compare_dices(dices1: list[int], dices2: list[int], pattern: int) -> int:
                 return 1
             else:
                 return -1
+
+
+def get_scoring_cards():
+    cards = {"h" + str(i): 1 for i in range(2, 15)}
+    cards.update({
+        "s12": 13,
+        "s13": 10,
+        "s14": 7
+    })
+    return cards

@@ -83,6 +83,7 @@ class WitcherRoomManager(BaseRoomManager):
         loser_stats.matches_lost += 1
         loser_stats.matches_played += 1
         db.commit()
+        db.close()
         for connection in self.connection_list:
             await connection[0].close()
         for spectator in self.spectator_list:
@@ -113,6 +114,8 @@ class WitcherRoomManager(BaseRoomManager):
                 self.game_state.round_result = -1
 
     async def timed_out(self):
+        if not self.use_timer:
+            return
         self.game_state.is_finished = True
         if self.game_state.current_player is None:
             score1, score2 = self.game_state.score

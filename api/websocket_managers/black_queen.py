@@ -1,15 +1,22 @@
 from sqlalchemy.orm import Session
-from starlette.websockets import WebSocket
+from fastapi.websockets import WebSocket
+from websockets.exceptions import ConnectionClosed
 from ..schemas.game import BlackQueenGameSchema
 from ..database import SessionLocal
+from ..services import user_service
+from ..utils import get_scoring_cards
+from .general import RoomListManager
 import random
 from .base_game import BaseRoomManager
+from operator import itemgetter
 
 
 class BlackQueenManager(BaseRoomManager):
 
     max_players = 3
     game_name = "Black-queen"
+    allow_spectators = False
+    use_timer = False
 
     def __init__(self, room_id: str):
         super().__init__(room_id=room_id)
@@ -26,16 +33,8 @@ class BlackQueenManager(BaseRoomManager):
             is_finished=False,
             turn=1,
             deal=0,
-            scoring_cards={"h" + str(i): 1 for i in range(2, 11)}.update({
-                "h11": 1,
-                "h12": 1,
-                "h13": 1,
-                "h14": 1,
-                "s12": 13,
-                "s13": 10,
-                "s14": 7
-            })
-        )
+            scoring_cards=get_scoring_cards()
+            )
 
     @staticmethod
     async def get_full_deck():
@@ -46,6 +45,22 @@ class BlackQueenManager(BaseRoomManager):
                 deck.append(char + str(i))
         deck.remove("c2")
         return deck
+
+    async def send_game_state(self):
+        game_state = self.game_state.dict()
+        del game_state['decks']
+        user_data = dict(zip(self.game_state.players, self.game_state.decks))
+        for connection in self.connection_list:
+            try:
+                game_state['deck'] = user_data[connection[1].username]
+                await connection[0].send_json(game_state)
+            except ConnectionClosed:
+                pass
+        for spectator in self.spectator_list:
+            try:
+                await spectator.send_json(self.game_state.dict())
+            except ConnectionClosed:
+                pass
 
     async def dispatch(self, data: dict, ws: WebSocket):
         actions = ("ready", "authorize", "put")
@@ -72,7 +87,7 @@ class BlackQueenManager(BaseRoomManager):
         if not self.game_state.ready[0] and not self.game_state.ready[1] and not self.game_state.ready[2]:
             await self.send_game_state()
             return
-        if action == "place" and data.get('card'):
+        if action == "put" and data.get('card'):
             card = data['card']
             deck = self.game_state.decks[player_index]
             if card not in deck[card[0]]:
@@ -133,7 +148,56 @@ class BlackQueenManager(BaseRoomManager):
 
     async def finish_game(self, db: Session = SessionLocal()):
         self.game_state.is_finished = True
-        
+        score_table = sorted(zip(self.game_state.score, self.game_state.players), key=itemgetter(0))
+        third_player = score_table[0][1]
+        second_player = score_table[1][1]
+        first_player = score_table[2][1]
+        for connection in self.connection_list:
+            if connection[1].username == third_player:
+                third_user_id = connection[1].id
+            elif connection[1].username == second_player:
+                second_user_id = connection[1].id
+            elif connection[1].username == first_player:
+                first_user_id = connection[1].id
+        third_stats = user_service.get_user_stats(
+            db=db,
+            limit=1,
+            offset=0,
+            user_id=third_user_id,
+            game="Black-queen"
+        )
+        second_stats = user_service.get_user_stats(
+            db=db,
+            limit=1,
+            offset=0,
+            user_id=second_user_id,
+            game="Black-queen"
+        )
+        first_stats = user_service.get_user_stats(
+            db=db,
+            limit=1,
+            offset=0,
+            user_id=first_user_id,
+            game="Black-queen"
+        )
+        if score_table[0][0] < score_table[1][0] < score_table[2][0]:
+            first_stats.matches_won += 1
+            third_stats.matches_lost += 1
+        elif score_table[0][0] == score_table[1][0] < score_table[2][0]:
+            first_stats.matches_won += 1
+        elif score_table[0][0] < score_table[1][0] == score_table[2][0]:
+            third_stats.matches_lost += 1
+        first_stats.matches_played += 1
+        second_stats.matches_played += 1
+        third_stats.matches_played += 1
+        db.commit()
+        db.close()
+        for connection in self.connection_list:
+            await connection[0].close()
+        for spectator in self.spectator_list:
+            await spectator.close()
+        RoomListManager.room_list.remove(self)
+        await RoomListManager.send_to_all()
 
     async def timed_out(self):
         pass

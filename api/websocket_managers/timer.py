@@ -19,7 +19,6 @@ class Timer:
             self.timeout -= 1
             if self.timeout <= 0:
                 self.room.game_state.timeout = None
-                self.room.game_state.is_finished = True
                 await self.room.send_game_state()
                 await self.room.timed_out()
                 break

@@ -39,7 +39,7 @@ const WitcherRoomPage = ({roomId}) => {
 
     const reducer = (state, action) => {
         if (!gameState.ready[0] || !gameState.ready[1] || gameState.current_player !== yourIndex
-             || spectatorMode || !gameState.is_finished) {
+             || spectatorMode || gameState.is_finished) {
             return state;
         }
         switch (action.type) {

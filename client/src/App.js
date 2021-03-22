@@ -24,7 +24,7 @@ const App = () => {
 
 	const [loading, setLoading] = useState(true);
 	const [navbarDropdown, setNavbarDropdown] = useState(false);
-	document.body.style.overflowY = navbarDropdown && window.innerWidth <= 768 ? ("hidden", console.log("xd")) : "auto";
+	document.body.style.overflowY = navbarDropdown && window.innerWidth <= 768 ? "hidden" : "auto";
 
 
 	const webSocketBase = "ws://localhost:8000/ws";
@@ -111,3 +111,5 @@ const App = () => {
 };
 
 export default App;
+
+// TODO ilosc rzutow, piniondze

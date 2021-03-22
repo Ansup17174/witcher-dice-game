@@ -119,6 +119,15 @@ def compare_dices(dices1: list[int], dices2: list[int], pattern: int) -> int:
             return 0
         elif sum(dices1) < sum(dices2):
             return 1
+        else:
+            dice1 = times_in_array(3, dices1)
+            dice2 = times_in_array(3, dices2)
+            if dice1 > dice2:
+                return 0
+            elif dice1 < dice2:
+                return 1
+            else:
+                return -1
     elif pattern == 3:
         dice1 = times_in_array(3, dices1)
         dice2 = times_in_array(3, dices2)

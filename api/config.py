@@ -1,9 +1,11 @@
 from passlib.context import CryptContext
+from datetime import timedelta
 import os
 
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "test")
 ALGORITHM = "HS256"
+ACCESS_TOKEN_LIFETIME = timedelta(days=7)
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 EMAIL_HOST = os.environ.get("EMAIL_HOST")

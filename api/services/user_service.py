@@ -6,7 +6,7 @@ from uuid import uuid4
 from .. import config
 from ..models import UserModel, EmailModel, UserStatsModel
 from ..database import get_db
-from ..config import password_context
+from ..config import password_context, ACCESS_TOKEN_LIFETIME
 from ..utils import send_confirmation_mail, send_new_password
 from typing import Optional
 from datetime import timedelta, datetime
@@ -134,11 +134,8 @@ def authenticate_user(token: str = Depends(oauth2_scheme), db: Session = Depends
         raise HTTPException(detail="Invalid access token", status_code=401)
 
 
-def generate_access_token(
-        data: dict,
-        expire_delta: Optional[timedelta] = timedelta(minutes=30)
-):
-    to_encode = {**data, 'exp': datetime.utcnow() + expire_delta}
+def generate_access_token(data: dict):
+    to_encode = {**data, 'exp': datetime.utcnow() + ACCESS_TOKEN_LIFETIME}
     return jwt.encode(to_encode, key=config.SECRET_KEY, algorithm=config.ALGORITHM)
 
 

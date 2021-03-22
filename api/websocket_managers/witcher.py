@@ -21,12 +21,12 @@ class WitcherRoomManager(BaseRoomManager):
             "players": [],
             "score": [0, 0],
             "dices": [
-                [6, 6, 6, 6, 6],
-                [6, 6, 6, 6, 6]
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0]
             ],
             "dices_value": [0, 0],
             "current_player": None,
-            "turn": 1,
+            "turn": 0,
             "deal": 1,
             "is_finished": False,
             "ready": [False, False],
@@ -48,7 +48,11 @@ class WitcherRoomManager(BaseRoomManager):
         await self.roll_dices(player_index=1)
 
     async def initialize_game(self):
-        await self.reset_dices()
+        self.game_state.turn = 0
+        self.game_state.dices = [
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ]
         self.game_state.current_player = 0
 
     async def finish_game(self, db: Session = SessionLocal()):
@@ -93,7 +97,6 @@ class WitcherRoomManager(BaseRoomManager):
         await RoomListManager.send_to_all()
 
     async def next_round(self):
-        self.game_state.turn = 1
         self.game_state.deal += 1
         self.game_state.ready = [False, False]
         if self.game_state.dices_value[0] > self.game_state.dices_value[1]:
@@ -170,11 +173,16 @@ class WitcherRoomManager(BaseRoomManager):
             return
         if action == 'roll':
             chosen_dices = data.get('dices')
-            await self.roll_dices(player_index=player_index, chosen_dices=chosen_dices)
+            if self.game_state.turn > 1:
+                await self.roll_dices(player_index=player_index, chosen_dices=chosen_dices)
+            else:
+                await self.roll_dices(player_index=player_index)
         elif action == 'pass':
+            if self.game_state.turn < 2:
+                return
             await self.send_game_state()
         self.game_state.turn += 1
-        if self.game_state.turn == 5:
+        if self.game_state.turn == 4:
             await self.next_round()
         if self.game_state.score[0] == 2 or self.game_state.score[1] == 2:
             await self.finish_game()

@@ -5,7 +5,7 @@ import {GameButtons} from '../components/games';
 import SmallButton from '../components/SmallButton';
 import useGlobalContext from '../GlobalContext';
 
-
+// NOT FINISHED
 
 const BlackQueenRoomPage = ({roomId}) => {
     

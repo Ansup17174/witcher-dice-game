@@ -10,6 +10,8 @@ import random
 from .base_game import BaseRoomManager
 from operator import itemgetter
 
+# NOT FINISHED
+
 
 class BlackQueenManager(BaseRoomManager):
 

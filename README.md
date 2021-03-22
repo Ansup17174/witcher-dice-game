@@ -1,12 +1,12 @@
-<h3>WebSocket based online dice game, inspired by The Witcher's dice game.</h3>
+<h3>Site with websocket based online games, including tic-tac-toe and dice game inspired by The Witcher's dice game.</h3>
 Client written in React.
 API written in FastAPI with SQLAlchemy ORM.
 
 How to run locally:
 
 1. Clone the project:
-<pre>$ git clone https://github.com/Ansup17174/witcher-dice-game.git</pre>
-<pre>$ cd witcher-dice-game</pre>
+<pre>$ git clone https://github.com/Ansup17174/game-center.git</pre>
+<pre>$ cd game-center</pre>
 
 
 2. Configuration:

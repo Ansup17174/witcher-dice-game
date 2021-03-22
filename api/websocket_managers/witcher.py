@@ -13,7 +13,7 @@ class WitcherRoomManager(BaseRoomManager):
 
     game_name = "Witcher-dice"
     max_players = 2
-    use_timer = False
+    use_timer = True
 
     def __init__(self, room_id: str):
         super().__init__(room_id=room_id)

@@ -44,7 +44,7 @@ async def create_room(room_type: str, user: UserModel = Depends(user_service.aut
     room_types = {
         "Witcher-dice": WitcherRoomManager,
         "Tic-tac-toe": TicTacToeManager,
-        "Black-queen": BlackQueenManager
+        # "Black-queen": BlackQueenManager NOT FINISHED
     }
     if room_type not in room_types.keys():
         raise HTTPException(detail="Invalid room type", status_code=400)
